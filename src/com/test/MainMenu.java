@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package com.test;
 
 import android.app.Activity;
@@ -22,17 +16,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-/**
- *
- * @author Pi_Joules
- */
+
 public class MainMenu extends Activity {
 
     Button play;
     TableLayout table;
-    
-    public final String scores = "Game_Scores.txt";
-    public final String delimeter = "#####";
     
     @Override
     public void onCreate(Bundle icicle) {
@@ -47,8 +35,6 @@ public class MainMenu extends Activity {
         
         setContentView(R.layout.main_menu_layout);
         
-        setTitle("Test App Game");
-        
         play = (Button) findViewById(R.id.play);
         play.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
@@ -58,7 +44,7 @@ public class MainMenu extends Activity {
         });
         table = (TableLayout) findViewById(R.id.table);
         
-        checkFile(scores);
+        System.out.println("Loaded Main Menu");
     }
     
     public String readSavedData(String file){

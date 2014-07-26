@@ -10,6 +10,7 @@
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R$string.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Test2$1.class \
+/Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Test2$2.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Test2$CustomDrawableView$1$1.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Test2$CustomDrawableView$1.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Test2$CustomDrawableView.class \

@@ -6,6 +6,7 @@
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R$drawable.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R$id.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R$layout.class \
+/Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R$raw.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R$string.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Test2$1.class \

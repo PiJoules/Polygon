@@ -4,30 +4,28 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
-    <TextView
+    <ImageView
+        android:src="@drawable/polygone"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:textSize="30sp"
-        android:text="This is a game. Play it.">
-    </TextView>
-    <TextView
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="Instructions: tilt the phone to control the black ball. Eat smaller green balls to grow. Be sure not to eat the larger balls though, or you'll die."
-        android:textSize="15sp"
-        android:layout_margin="10dp">
-    </TextView>
+        android:layout_height="wrap_content">
+    </ImageView>
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_marginBottom="30dp">
         <Button
             android:id="@+id/play"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:text="Play">
+        </Button>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Settings">
         </Button>
     </LinearLayout>
     <TableLayout

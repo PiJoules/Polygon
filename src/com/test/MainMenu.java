@@ -12,6 +12,8 @@ import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TableLayout;
 import java.io.BufferedReader;
@@ -19,7 +21,6 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 
 /**
  *
@@ -36,10 +37,15 @@ public class MainMenu extends Activity {
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
-        // ToDo add your GUI initialization code here     
+        
+        //Remove title bar and notification bar
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        
+        // set to landscape view
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         setContentView(R.layout.main_menu_layout);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         setTitle("Test App Game");
         
@@ -53,19 +59,7 @@ public class MainMenu extends Activity {
         table = (TableLayout) findViewById(R.id.table);
         
         checkFile(scores);
-        
-        /*String topScores = readSavedData(scores);
-        if (topScores.contains(delimeter)){
-            
-        }*/
     }
-    
-    /*public void parseScores(String topScores){
-        String[] scoreArray = topScores.split(delimeter);
-        for (int i = 0; i < scoreArray.length; i+=2){
-            TextView t
-        }
-    }*/
     
     public String readSavedData(String file){
         // note: stringbuffer is synchronized, stringbuilder is not, but both essentially do same

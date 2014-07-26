@@ -1,7 +1,6 @@
 package com.test;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -15,12 +14,20 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.Arrays;
 
-
+/**
+ *
+ * @author Pi_Joules
+ */
 public class MainMenu extends Activity {
 
-    Button play;
-    TableLayout table;
+    // xml stuff
+    private Button play, settings;
+    private TableLayout table;
+    
+    private final String SCORESFILE = "scores.txt";
     
     @Override
     public void onCreate(Bundle icicle) {
@@ -42,16 +49,25 @@ public class MainMenu extends Activity {
                 startActivity(playScreen);
             }
         });
+        
+        settings = (Button) findViewById(R.id.settings);
+        settings.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent settingsScreen = new Intent(getApplicationContext(), Settings.class);
+                startActivity(settingsScreen);
+            }
+        });
+        
         table = (TableLayout) findViewById(R.id.table);
         
         System.out.println("Loaded Main Menu");
     }
     
-    public String readSavedData(String file){
+    private String readSavedData(String fileName){
         // note: stringbuffer is synchronized, stringbuilder is not, but both essentially do same
         StringBuffer datax = new StringBuffer("");
         try {
-            FileInputStream in = openFileInput(file);
+            FileInputStream in = openFileInput(fileName);
             InputStreamReader isr = new InputStreamReader(in);
             BufferedReader br = new BufferedReader(isr);
             
@@ -69,25 +85,27 @@ public class MainMenu extends Activity {
         return datax.toString();
     }
     
-    public void writeData(String data, String file){
-        try {
-            FileOutputStream fOut = openFileOutput(file,Context.MODE_PRIVATE);
-            fOut.write(data.getBytes());
-            fOut.close();
+    private void writeData(String contents, String fileName){
+        try{
+            FileOutputStream fOut = openFileOutput(fileName, MODE_WORLD_READABLE);
+            OutputStreamWriter osw = new OutputStreamWriter(fOut); 
+
+            // Write the string to the file
+            osw.write(contents);
+
+            /* ensure that everything is
+             * really written out and close */
+            osw.flush();
+            osw.close();
         }
         catch (IOException e){}
-    }
-    
-    public void checkFile(String file){
-        boolean exists = readSavedData(file).equals("");
-        if (!exists) writeData("", file);
     }
     
     
     @Override
     protected void onResume(){
         super.onResume();
-        
+        System.out.println("Contents of saved data: " + readSavedData(SCORESFILE));
     }
     
 }

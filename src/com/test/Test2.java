@@ -1,14 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package com.test;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import static android.content.Context.MODE_WORLD_READABLE;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
@@ -26,8 +21,10 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Random;
@@ -37,6 +34,8 @@ import java.util.Random;
  * @author Pi_Joules
  */
 public class Test2 extends Activity implements SensorEventListener{
+    
+    private final String SCORESFILE = "scores.txt";
     
     // drawable stuff
     private CustomDrawableView mCustomDrawableView;
@@ -92,20 +91,36 @@ public class Test2 extends Activity implements SensorEventListener{
     }
     
     public void quitGame(float size){
-        EditText input = new EditText(this);
+        final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setHint("Enter name here to save score");
         new AlertDialog.Builder(this)
-                .setTitle("Max Size: " + round(size,4))
+                .setTitle("Max Size: " + round(size,2))
                 .setView(input)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
+                        writeData(input.getText().toString(), SCORESFILE);
                         finish();
                     }
                 }).show();
     }
     
-    // stuff
+    private void writeData(String contents, String fileName){
+        try{
+            FileOutputStream fOut = openFileOutput(fileName, MODE_WORLD_READABLE);
+            OutputStreamWriter osw = new OutputStreamWriter(fOut); 
+
+            // Write the string to the file
+            osw.write(contents);
+
+            /* ensure that everything is
+             * really written out and close */
+            osw.flush();
+            osw.close();
+        }
+        catch (IOException e){}
+    }
+    
     @Override
     protected void onResume() {
         super.onResume();
@@ -239,7 +254,7 @@ public class Test2 extends Activity implements SensorEventListener{
                     }
 
                     p.setColor(Color.GREEN);
-                    canvas.drawOval(squares.get(i), p);
+                    canvas.drawRect(squares.get(i), p);
                     
                     if (!paused){
                         // initially used intersect method, though was not very accurate for ovals
@@ -288,9 +303,6 @@ public class Test2 extends Activity implements SensorEventListener{
                 float[][] initOvalsTraj = {{1,1},{-1,1}};
                 squareVels.add(initOvalsTraj[0]);
                 squareVels.add(initOvalsTraj[1]);
-                
-                
-                System.out.println(this.getWidth() + ", " + this.getHeight());
             }
             
             // redraw on canvas

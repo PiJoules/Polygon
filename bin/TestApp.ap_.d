@@ -10,6 +10,7 @@
 /Users/Pi_Joules/NetBeansProjects/TestApp/res/drawable-xhdpi/polygone.png \
 /Users/Pi_Joules/NetBeansProjects/TestApp/res/layout/main.xml \
 /Users/Pi_Joules/NetBeansProjects/TestApp/res/layout/main_menu_layout.xml \
+/Users/Pi_Joules/NetBeansProjects/TestApp/res/layout/settings_layout.xml \
 /Users/Pi_Joules/NetBeansProjects/TestApp/res/raw/polygone.png \
 /Users/Pi_Joules/NetBeansProjects/TestApp/res/values/strings.xml \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/res/drawable-hdpi/ball.png \

@@ -16,10 +16,15 @@ public final class R {
         public static final int polygone=0x7f020002;
     }
     public static final class id {
+        public static final int clear=0x7f06000e;
+        public static final int done=0x7f06000f;
+        public static final int filter=0x7f06000d;
         public static final int main_layout=0x7f060000;
         public static final int play=0x7f060009;
+        public static final int settings=0x7f06000a;
         public static final int size=0x7f060008;
-        public static final int table=0x7f06000a;
+        public static final int table=0x7f06000b;
+        public static final int title=0x7f06000c;
         public static final int xPos=0x7f060002;
         public static final int xVel=0x7f060003;
         public static final int x_axis=0x7f060001;
@@ -31,6 +36,7 @@ public final class R {
     public static final class layout {
         public static final int main=0x7f030000;
         public static final int main_menu_layout=0x7f030001;
+        public static final int settings_layout=0x7f030002;
     }
     public static final class raw {
         public static final int polygone=0x7f040000;

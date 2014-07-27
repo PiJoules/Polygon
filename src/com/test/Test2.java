@@ -94,31 +94,16 @@ public class Test2 extends Activity implements SensorEventListener{
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setHint("Enter name here to save score");
+        final ScoreManager sm = new ScoreManager(this);
         new AlertDialog.Builder(this)
                 .setTitle("Max Size: " + round(size,2))
                 .setView(input)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
-                        writeData(input.getText().toString(), SCORESFILE);
+                        sm.writeData(input.getText().toString());
                         finish();
                     }
                 }).show();
-    }
-    
-    private void writeData(String contents, String fileName){
-        try{
-            FileOutputStream fOut = openFileOutput(fileName, MODE_WORLD_READABLE);
-            OutputStreamWriter osw = new OutputStreamWriter(fOut); 
-
-            // Write the string to the file
-            osw.write(contents);
-
-            /* ensure that everything is
-             * really written out and close */
-            osw.flush();
-            osw.close();
-        }
-        catch (IOException e){}
     }
     
     @Override

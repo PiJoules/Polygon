@@ -63,49 +63,11 @@ public class MainMenu extends Activity {
         System.out.println("Loaded Main Menu");
     }
     
-    private String readSavedData(String fileName){
-        // note: stringbuffer is synchronized, stringbuilder is not, but both essentially do same
-        StringBuffer datax = new StringBuffer("");
-        try {
-            FileInputStream in = openFileInput(fileName);
-            InputStreamReader isr = new InputStreamReader(in);
-            BufferedReader br = new BufferedReader(isr);
-            
-            String readString = br.readLine();
-            while (readString != null){
-                datax.append(readString);
-                readString = br.readLine();
-            }
-            
-            isr.close();
-        }
-        catch (IOException e){
-            return "";
-        }
-        return datax.toString();
-    }
-    
-    private void writeData(String contents, String fileName){
-        try{
-            FileOutputStream fOut = openFileOutput(fileName, MODE_WORLD_READABLE);
-            OutputStreamWriter osw = new OutputStreamWriter(fOut); 
-
-            // Write the string to the file
-            osw.write(contents);
-
-            /* ensure that everything is
-             * really written out and close */
-            osw.flush();
-            osw.close();
-        }
-        catch (IOException e){}
-    }
-    
-    
     @Override
     protected void onResume(){
         super.onResume();
-        System.out.println("Contents of saved data: " + readSavedData(SCORESFILE));
+        final ScoreManager sm = new ScoreManager(this);
+        System.out.println("Contents of saved data: " + sm.readSavedData());
     }
     
 }

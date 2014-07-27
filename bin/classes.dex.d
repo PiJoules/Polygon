@@ -10,6 +10,7 @@
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R$raw.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R$string.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/R.class \
+/Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/ScoreManager.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Settings$1.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Settings$2.class \
 /Users/Pi_Joules/NetBeansProjects/TestApp/bin/classes/com/test/Settings$3.class \

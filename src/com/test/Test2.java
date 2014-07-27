@@ -3,7 +3,6 @@ package com.test;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
-import static android.content.Context.MODE_WORLD_READABLE;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
@@ -21,10 +20,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.TextView;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Random;
@@ -35,8 +30,6 @@ import java.util.Random;
  */
 public class Test2 extends Activity implements SensorEventListener{
     
-    private final String SCORESFILE = "scores.txt";
-    
     // drawable stuff
     private CustomDrawableView mCustomDrawableView;
     protected boolean paused = false;
@@ -46,7 +39,8 @@ public class Test2 extends Activity implements SensorEventListener{
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     
-    public TextView tvX, tvY, tvZ, tvXPos, tvYPos, tvXVel, tvYVel, size;
+    // oval size
+    public float size;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -62,15 +56,6 @@ public class Test2 extends Activity implements SensorEventListener{
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         setContentView(R.layout.main);
-        
-        tvX = (TextView)findViewById(R.id.x_axis);
-        tvY = (TextView)findViewById(R.id.y_axis);
-        tvZ = (TextView)findViewById(R.id.z_axis);
-        tvXPos = (TextView) findViewById(R.id.xPos);
-        tvYPos = (TextView) findViewById(R.id.yPos);
-        tvXVel = (TextView) findViewById(R.id.xVel);
-        tvYVel = (TextView) findViewById(R.id.yVel);
-        size = (TextView) findViewById(R.id.size);
         
         // accelerometer stuff
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
@@ -90,17 +75,18 @@ public class Test2 extends Activity implements SensorEventListener{
         System.out.println("Loaded Game");
     }
     
-    public void quitGame(float size){
+    public void quitGame(){
         final EditText input = new EditText(this);
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         input.setHint("Enter name here to save score");
         final ScoreManager sm = new ScoreManager(this);
         new AlertDialog.Builder(this)
-                .setTitle("Max Size: " + round(size,2))
+                .setTitle("Max Size: " + String.format("%.2f",size))
                 .setView(input)
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
-                        sm.writeData(input.getText().toString());
+                        String name = input.getText().toString();
+                        sm.checkNewScore(name==null||"".equals(name)?"Anonymous":name, String.format("%.2f",size));
                         finish();
                     }
                 }).show();
@@ -125,11 +111,7 @@ public class Test2 extends Activity implements SensorEventListener{
         xAccel = event.values[0];
         yAccel = event.values[1];
         zAccel = event.values[2];
-            
-        // display the absolute values
-        tvX.setText("xAcc: " + round(xAccel,4));
-        tvY.setText("yAcc: " + round(yAccel,4));
-        tvZ.setText("zAcc: " + round(zAccel,4));
+        
     }
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     
@@ -204,11 +186,7 @@ public class Test2 extends Activity implements SensorEventListener{
                     if (oval.top < 0) oval.offsetTo(oval.left,0);
                     if (oval.right > canvasWidth) oval.offsetTo(canvasWidth-oval.width(),oval.top);
                     if (oval.bottom > canvasHeight) oval.offsetTo(oval.left,canvasHeight-oval.height());
-
-                    tvXPos.setText("xPos: " + round(oval.left,4));
-                    tvYPos.setText("yPos: " + round(oval.top,4));
-                    tvXVel.setText("xVel: " + round(-xAccel,4));
-                    tvYVel.setText("yVel: " + round(yAccel,4));
+                    
                 }
                 
                 p.setColor(Color.BLACK);
@@ -253,13 +231,13 @@ public class Test2 extends Activity implements SensorEventListener{
                                 squareVels.remove(i);
                             }
                             else{
-                                quitGame(oval.width());
+                                quitGame();
                                 return;
                             }
                         }
                     }
                     
-                    size.setText("size: " + round(oval.width(),4));
+                    size = round(oval.width(),2);
                     
                 }
                 

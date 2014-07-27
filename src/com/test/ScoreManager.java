@@ -22,13 +22,17 @@ import java.io.OutputStreamWriter;
 public class ScoreManager {
     
     private final String SCORESFILE = "scores.txt";
+    private final String DELIMETER = "#";
+    private final String DELIMETER2 = "##";
     private Context context;
+    private String[][] scores;
     
     public ScoreManager(Context context){
         this.context = context;
+        this.scores = parseScores();
     }
     
-    public String readSavedData(){
+    private String readSavedData(){
         // note: stringbuffer is synchronized, stringbuilder is not, but both essentially do same
         StringBuffer datax = new StringBuffer("");
         try {
@@ -44,13 +48,66 @@ public class ScoreManager {
             
             isr.close();
         }
+        // may not be able to read file because it contains nothing or does not exist
         catch (IOException e){
-            return "";
+            clearData();
+            return readSavedData();
         }
         return datax.toString();
     }
     
-    public void writeData(String contents){
+    private String[][] parseScores(){
+        String[][] s = new String[5][2];
+        String[] data = readSavedData().split(DELIMETER2);
+        for (int i = 0; i < data.length; i++){
+            s[i] = data[i].split(DELIMETER);
+        }
+        return s;
+    }
+    
+    public String[][] getParsedScores(){
+        return this.scores;
+    }
+    
+    // check if new score is high enough to be saved
+    public void checkNewScore(String name, String score){
+        boolean checking = true;
+        String[][] tempScores = new String[this.scores.length+1][this.scores[0].length];
+        for (int i = 0,j=0; i < tempScores.length; i++){
+            if (Double.parseDouble(score) > Double.parseDouble(this.scores[j][1]) && checking){
+                tempScores[i][0] = name;
+                tempScores[i][1] = score;
+                checking = false;
+            }
+            else {
+                tempScores[i] = this.scores[j++];
+            }
+        }
+        for (int i = 0; i < this.scores.length; i++){
+            this.scores[i] = tempScores[i];
+        }
+        encodeScores();
+    }
+    
+    private void encodeScores(){
+        String nextScores = "";
+        for (String[] score : this.scores) {
+            nextScores += DELIMETER2 + score[0] + DELIMETER + score[1];
+        }
+        nextScores = nextScores.substring(2);
+        writeData(nextScores);
+    }
+    
+    public void clearData(){
+        String base = "";
+        for (int i = 0; i < 5; i++){
+            base += DELIMETER2 + "..." + DELIMETER + "0";
+        }
+        base = base.substring(2);
+        writeData(base);
+    }
+    
+    private void writeData(String contents){
         try{
             FileOutputStream fOut = this.context.openFileOutput(SCORESFILE, MODE_WORLD_READABLE);
             OutputStreamWriter osw = new OutputStreamWriter(fOut); 

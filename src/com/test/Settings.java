@@ -2,7 +2,6 @@ package com.test;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import static android.content.Context.MODE_WORLD_READABLE;
 import android.content.DialogInterface;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -10,9 +9,6 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 
 /**
  *
@@ -21,8 +17,6 @@ import java.io.OutputStreamWriter;
 public class Settings extends Activity {
     
     private Button clear, done;
-    
-    private final String SCORESFILE = "scores.txt";
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -60,7 +54,7 @@ public class Settings extends Activity {
                 .setTitle("Are you sure you want to delete your local scores?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
-                        sm.writeData("");
+                        sm.clearData();
                         System.out.println("Scores have been cleared.");
                     }
                 })

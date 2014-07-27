@@ -9,12 +9,7 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TableLayout;
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
+import android.widget.TextView;
 import java.util.Arrays;
 
 /**
@@ -26,8 +21,7 @@ public class MainMenu extends Activity {
     // xml stuff
     private Button play, settings;
     private TableLayout table;
-    
-    private final String SCORESFILE = "scores.txt";
+    private TextView[][] tvs;
     
     @Override
     public void onCreate(Bundle icicle) {
@@ -58,8 +52,6 @@ public class MainMenu extends Activity {
             }
         });
         
-        table = (TableLayout) findViewById(R.id.table);
-        
         System.out.println("Loaded Main Menu");
     }
     
@@ -67,7 +59,22 @@ public class MainMenu extends Activity {
     protected void onResume(){
         super.onResume();
         final ScoreManager sm = new ScoreManager(this);
-        System.out.println("Contents of saved data: " + sm.readSavedData());
+        String[][] scores = sm.getParsedScores();
+        
+        if (table == null){
+            table = (TableLayout) findViewById(R.id.table);
+            tvs = new TextView[scores.length][scores[0].length];
+            for (int i = 0; i < scores.length; i++){
+                tvs[i][0] = (TextView) findViewById(R.id.name0 + 2*i);
+                tvs[i][1] = (TextView) findViewById(R.id.name0 + 2*i+1);
+            }
+        }
+        for (int i = 0; i < scores.length; i++){
+            tvs[i][0].setText(scores[i][0]);
+            tvs[i][1].setText(scores[i][1]);
+        }
+        
+        System.out.println("Contents of saved data: " + Arrays.deepToString(scores));
     }
     
 }

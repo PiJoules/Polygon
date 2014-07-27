@@ -16,15 +16,25 @@ public final class R {
         public static final int polygone=0x7f020002;
     }
     public static final class id {
-        public static final int clear=0x7f06000e;
-        public static final int done=0x7f06000f;
-        public static final int filter=0x7f06000d;
+        public static final int clear=0x7f060018;
+        public static final int done=0x7f060019;
+        public static final int filter=0x7f060017;
         public static final int main_layout=0x7f060000;
+        public static final int name0=0x7f06000c;
+        public static final int name1=0x7f06000e;
+        public static final int name2=0x7f060010;
+        public static final int name3=0x7f060012;
+        public static final int name4=0x7f060014;
         public static final int play=0x7f060009;
+        public static final int score0=0x7f06000d;
+        public static final int score1=0x7f06000f;
+        public static final int score2=0x7f060011;
+        public static final int score3=0x7f060013;
+        public static final int score4=0x7f060015;
         public static final int settings=0x7f06000a;
         public static final int size=0x7f060008;
         public static final int table=0x7f06000b;
-        public static final int title=0x7f06000c;
+        public static final int title=0x7f060016;
         public static final int xPos=0x7f060002;
         public static final int xVel=0x7f060003;
         public static final int x_axis=0x7f060001;

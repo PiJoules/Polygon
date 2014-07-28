@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Random;
@@ -41,6 +42,12 @@ public class Test2 extends Activity implements SensorEventListener{
     
     // oval size
     public float size;
+
+    // Oval coefficient of restitution. Used in collisions with edge
+    public static final float RESTITUTION = 0.2f;
+
+    // Current velocity of oval
+    private static float xVel, yVel;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -124,6 +131,24 @@ public class Test2 extends Activity implements SensorEventListener{
         return bd.floatValue();
     }
 
+    // Getter and setter methods for oval velocity
+    public static float getXVel(){
+        return xVel;
+    }
+
+    public static float getYVel(){
+        return yVel;
+    }
+
+    public static void setXVel(float newVel){
+        xVel = newVel;
+    }
+
+    public static void setYVel(float newVel){
+        yVel = newVel;
+    }
+
+
     // the game view
     private class CustomDrawableView extends View {
         
@@ -178,14 +203,42 @@ public class Test2 extends Activity implements SensorEventListener{
             if (initialized){
                 
                 if (!paused){
-                    // for xVel, tilting right is negative, so flip it
-                    oval.offset(-xAccel, yAccel);
+                    // Calculate new velocity using accelerometer values as acceleration and a scaling factor of .01
+                    Test2.setXVel(Test2.getXVel() - .01f*xAccel); // for xVel, tilting right is negative, so flip it
+                    Test2.setYVel(Test2.getYVel() + .01f*yAccel);
+                    
+                    oval.offset(Test2.getXVel(), Test2.getYVel());
 
-                    // set bounds for controlled oval
-                    if (oval.left < 0) oval.offsetTo(0,oval.top);
-                    if (oval.top < 0) oval.offsetTo(oval.left,0);
-                    if (oval.right > canvasWidth) oval.offsetTo(canvasWidth-oval.width(),oval.top);
-                    if (oval.bottom > canvasHeight) oval.offsetTo(oval.left,canvasHeight-oval.height());
+                    // Check if oval has hit edge of screen
+                    
+                    if (oval.left < 0){
+                        // Collision with left side. Place oval at left edge
+                        oval.offsetTo(0,oval.top);
+                        // Reverse velocity and scale x velocity by coefficient of restitution
+                        Test2.setXVel(-Test2.RESTITUTION*Test2.getXVel());
+                    }
+
+
+                    if (oval.top < 0) {
+                        // Collision with top side. Place oval at top edge
+                        oval.offsetTo(oval.left,0);
+                        // Reverse velocity and scale y velocity by coefficient of restitution
+                        Test2.setYVel(-Test2.RESTITUTION*Test2.getYVel());
+                    }
+                    
+                    if (oval.right > canvasWidth){
+                        // Collision with right side. Place oval at right edge
+                        oval.offsetTo(canvasWidth-oval.width(),oval.top);
+                        // Reverse velocity and scale x velocity by coefficient of restitution
+                        Test2.setXVel(-Test2.RESTITUTION*Test2.getXVel());                        
+                    }
+                    
+                    if (oval.bottom > canvasHeight){
+                        // Collision with bottom side. Place oval at bottom edge
+                        oval.offsetTo(oval.left,canvasHeight-oval.height());
+                        // Reverse velocity and scale y velocity by coefficient of restitution
+                        Test2.setYVel(-Test2.RESTITUTION*Test2.getYVel());
+                    }
                     
                 }
                 
@@ -240,6 +293,7 @@ public class Test2 extends Activity implements SensorEventListener{
                                 squareVels.remove(i);
                             }
                             else{
+                                // You were eaten by a larger polygon. You lose
                                 quitGame();
                                 return;
                             }
@@ -257,6 +311,7 @@ public class Test2 extends Activity implements SensorEventListener{
                 initialized = true;
                 
                 // setup controlled oval
+                // Set initial position at middle of screen
                 float xPos = (canvasWidth-oval.width())/2;
                 float yPos = (canvasHeight-oval.height())/2;
                 oval.set(
@@ -265,6 +320,10 @@ public class Test2 extends Activity implements SensorEventListener{
                         xPos+oval.width(),
                         yPos+oval.height()
                 );
+
+                // Set initial velocity. Accelerometer movement will change the velocity
+                Test2.setXVel(0);
+                Test2.setYVel(0);
                 
                 // setup first 2 other ovals
                 // will be half size of controlled oval

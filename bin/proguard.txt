@@ -1,9 +1,0 @@
-# view AndroidManifest.xml #generated:10
--keep class com.test.MainMenu { <init>(...); }
-
-# view AndroidManifest.xml #generated:21
--keep class com.test.Settings { <init>(...); }
-
-# view AndroidManifest.xml #generated:18
--keep class com.test.Test2 { <init>(...); }
-

@@ -44,7 +44,10 @@ public class Test2 extends Activity implements SensorEventListener{
     public float size;
 
     // Oval coefficient of restitution. Used in collisions with edge
-    public static final float RESTITUTION = 0.2f;
+    public static final float RESTITUTION = 0.4f;
+
+    // A frictional coefficient. Allows more fine control at low speed
+    public static final float VISCOSITY = 0.1f;
 
     // Current velocity of oval
     private static float xVel, yVel;
@@ -113,11 +116,15 @@ public class Test2 extends Activity implements SensorEventListener{
     
     // sensor methods
     public void onSensorChanged(SensorEvent event) {
+        // Calculate net acceleration
+        float resultant = (float) Math.sqrt(event.values[0]*event.values[0] +
+                                            event.values[1]*event.values[1] + 
+                                            event.values[2]*event.values[2]);
         
-        // the actual tilt angles
-        xAccel = event.values[0];
-        yAccel = event.values[1];
-        zAccel = event.values[2];
+        // Get accleration components. Scale by 9.81/resultant so net acceleration is 1g
+        xAccel = -event.values[0]/resultant*9.81f; // for xAccel, tilting right is negative, so take opposite
+        yAccel = event.values[1]/resultant*9.81f;
+        zAccel = event.values[2]/resultant*9.81f;
         
     }
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -203,10 +210,29 @@ public class Test2 extends Activity implements SensorEventListener{
             if (initialized){
                 
                 if (!paused){
-                    // Calculate new velocity using accelerometer values as acceleration and a scaling factor of .01
-                    Test2.setXVel(Test2.getXVel() - .01f*xAccel); // for xVel, tilting right is negative, so flip it
-                    Test2.setYVel(Test2.getYVel() + .01f*yAccel);
+                    // Calculate new velocity and position of oval
+
+                    // Calculate current velocity for determination of frictional force
+                    float netVel = (float) Math.sqrt(Test2.getXVel()*Test2.getXVel() + Test2.getYVel()*Test2.getYVel());
                     
+                    // Calculate frictional force
+                    float frictionX, frictionY;
+                    if(netVel == 0){
+                        // Prevent divide by zero
+                        frictionX = 0f;
+                        frictionY = 0f;
+                    }
+                    else{
+                        // Friction is -velocity scaled by viscosity coefficient
+                        frictionX = -Test2.VISCOSITY*Test2.getXVel()/netVel;
+                        frictionY = -Test2.VISCOSITY*Test2.getYVel()/netVel;
+                    }
+
+                    // Compute new velocity by adding frictional force and accelerometer readings as another force
+                    Test2.setXVel(Test2.getXVel() + .05f*xAccel + frictionX);
+                    Test2.setYVel(Test2.getYVel() + .05f*yAccel + frictionY);
+                    
+                    // Set new position by moving oval in direction of its velocity
                     oval.offset(Test2.getXVel(), Test2.getYVel());
 
                     // Check if oval has hit edge of screen
@@ -322,8 +348,8 @@ public class Test2 extends Activity implements SensorEventListener{
                 );
 
                 // Set initial velocity. Accelerometer movement will change the velocity
-                Test2.setXVel(0);
-                Test2.setYVel(0);
+                Test2.setXVel(0f);
+                Test2.setYVel(0f);
                 
                 // setup first 2 other ovals
                 // will be half size of controlled oval

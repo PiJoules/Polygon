@@ -154,7 +154,7 @@ public class Test2 extends Activity implements SensorEventListener{
                                 public void run(){
                                     if (squares.size() < 10){ // limit of 10 ovals on canvas
                                         Random r = new Random();
-                                        float nextWidth = r.nextFloat()*2*oval.width();
+                                        float nextWidth = r.nextFloat()*oval.width()+oval.width()/2; // between 50% and 150% of current width
                                         float left = Math.round(r.nextFloat())*(canvasWidth-nextWidth);
                                         float top = Math.round(r.nextFloat())*(canvasHeight-nextWidth);
                                         float[] nextOvalsVel = {r.nextFloat()*2+(float)0.5,r.nextFloat()*2+(float)0.5};
@@ -198,6 +198,15 @@ public class Test2 extends Activity implements SensorEventListener{
                     if (!paused){
                         // set bounds for other ovals
                         squares.get(i).offset(squareVels.get(i)[0],squareVels.get(i)[1]);
+                        if ((squares.get(i).left < 0
+                                || squares.get(i).top < 0
+                                || squares.get(i).right > canvasWidth
+                                || squares.get(i).bottom > canvasHeight)
+                                && squares.size() >= 10){
+                            squares.remove(i);
+                            squareVels.remove(i);
+                            continue;
+                        }
                         if (squares.get(i).left < 0){
                             squares.get(i).offsetTo(0,squares.get(i).top);
                             squareVels.get(i)[0] = Math.abs(squareVels.get(i)[0]);

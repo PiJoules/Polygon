@@ -39,18 +39,9 @@ public class Test2 extends Activity implements SensorEventListener{
     public float xAccel, yAccel, zAccel;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-    
-    // oval size
+
+    // Oval size. Used to calculate score
     public float size;
-
-    // Oval coefficient of restitution. Used in collisions with edge
-    public static final float RESTITUTION = 0.4f;
-
-    // A frictional coefficient. Allows more fine control at low speed
-    public static final float VISCOSITY = 0.1f;
-
-    // Current velocity of oval
-    private static float xVel, yVel;
 
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -124,9 +115,9 @@ public class Test2 extends Activity implements SensorEventListener{
         // Get accleration components. Scale by 9.81/resultant so net acceleration is 1g
         xAccel = -event.values[0]/resultant*9.81f; // for xAccel, tilting right is negative, so take opposite
         yAccel = event.values[1]/resultant*9.81f;
-        zAccel = event.values[2]/resultant*9.81f;
-        
+        zAccel = event.values[2]/resultant*9.81f;    
     }
+
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     
     }
@@ -138,23 +129,6 @@ public class Test2 extends Activity implements SensorEventListener{
         return bd.floatValue();
     }
 
-    // Getter and setter methods for oval velocity
-    public static float getXVel(){
-        return xVel;
-    }
-
-    public static float getYVel(){
-        return yVel;
-    }
-
-    public static void setXVel(float newVel){
-        xVel = newVel;
-    }
-
-    public static void setYVel(float newVel){
-        yVel = newVel;
-    }
-
 
     // the game view
     private class CustomDrawableView extends View {
@@ -164,9 +138,10 @@ public class Test2 extends Activity implements SensorEventListener{
         public float canvasWidth, canvasHeight;
         public boolean initialized = false; // make sure to get canvas width/height
         
-        // controlled oval
-        public RectF oval = new RectF(0,0,10,10);
-        
+    
+        // The object representing the player character, an oval
+        public Player oval;
+
         // other ovals
         public ArrayList<RectF> squares = new ArrayList<RectF>();
         public ArrayList<float[]> squareVels = new ArrayList<float[]>(); // [xVel,yVel]
@@ -186,7 +161,7 @@ public class Test2 extends Activity implements SensorEventListener{
                                 public void run(){
                                     if (squares.size() < 10){ // limit of 10 ovals on canvas
                                         Random r = new Random();
-                                        float nextWidth = r.nextFloat()*oval.width()+oval.width()/2; // between 50% and 150% of current width
+                                        float nextWidth = r.nextFloat()*oval.getSize()*2+oval.getSize(); // between 50% and 150% of current width
                                         float left = Math.round(r.nextFloat())*(canvasWidth-nextWidth);
                                         float top = Math.round(r.nextFloat())*(canvasHeight-nextWidth);
                                         float[] nextOvalsVel = {r.nextFloat()*2+(float)0.5,r.nextFloat()*2+(float)0.5};
@@ -210,66 +185,13 @@ public class Test2 extends Activity implements SensorEventListener{
             if (initialized){
                 
                 if (!paused){
-                    // Calculate new velocity and position of oval
-
-                    // Calculate current velocity for determination of frictional force
-                    float netVel = (float) Math.sqrt(Test2.getXVel()*Test2.getXVel() + Test2.getYVel()*Test2.getYVel());
-                    
-                    // Calculate frictional force
-                    float frictionX, frictionY;
-                    if(netVel == 0){
-                        // Prevent divide by zero
-                        frictionX = 0f;
-                        frictionY = 0f;
-                    }
-                    else{
-                        // Friction is -velocity scaled by viscosity coefficient
-                        frictionX = -Test2.VISCOSITY*Test2.getXVel()/netVel;
-                        frictionY = -Test2.VISCOSITY*Test2.getYVel()/netVel;
-                    }
-
-                    // Compute new velocity by adding frictional force and accelerometer readings as another force
-                    Test2.setXVel(Test2.getXVel() + .05f*xAccel + frictionX);
-                    Test2.setYVel(Test2.getYVel() + .05f*yAccel + frictionY);
-                    
-                    // Set new position by moving oval in direction of its velocity
-                    oval.offset(Test2.getXVel(), Test2.getYVel());
-
-                    // Check if oval has hit edge of screen
-                    
-                    if (oval.left < 0){
-                        // Collision with left side. Place oval at left edge
-                        oval.offsetTo(0,oval.top);
-                        // Reverse velocity and scale x velocity by coefficient of restitution
-                        Test2.setXVel(-Test2.RESTITUTION*Test2.getXVel());
-                    }
-
-
-                    if (oval.top < 0) {
-                        // Collision with top side. Place oval at top edge
-                        oval.offsetTo(oval.left,0);
-                        // Reverse velocity and scale y velocity by coefficient of restitution
-                        Test2.setYVel(-Test2.RESTITUTION*Test2.getYVel());
-                    }
-                    
-                    if (oval.right > canvasWidth){
-                        // Collision with right side. Place oval at right edge
-                        oval.offsetTo(canvasWidth-oval.width(),oval.top);
-                        // Reverse velocity and scale x velocity by coefficient of restitution
-                        Test2.setXVel(-Test2.RESTITUTION*Test2.getXVel());                        
-                    }
-                    
-                    if (oval.bottom > canvasHeight){
-                        // Collision with bottom side. Place oval at bottom edge
-                        oval.offsetTo(oval.left,canvasHeight-oval.height());
-                        // Reverse velocity and scale y velocity by coefficient of restitution
-                        Test2.setYVel(-Test2.RESTITUTION*Test2.getYVel());
-                    }
-                    
+                    // Calculate new speed and position of player and move player
+                    // Handled in player class
+                    oval.move(xAccel, yAccel);                    
                 }
                 
                 p.setColor(Color.BLACK);
-                canvas.drawOval(oval, p);
+                canvas.drawOval(oval.oval, p);
                 
                 // set values for other ovals
                 for (int i = 0; i < squares.size(); i++){
@@ -309,12 +231,13 @@ public class Test2 extends Activity implements SensorEventListener{
                     
                     if (!paused){
                         // initially used intersect method, though was not very accurate for ovals
-                        double d = Math.sqrt(Math.pow(oval.centerX()-squares.get(i).centerX(),2)+Math.pow(oval.centerY()-squares.get(i).centerY(),2));
-                        if (d < oval.width()/2 + squares.get(i).width()/2){
-                            if (squares.get(i).width() <= oval.width()){
-                                float area = (float) (Math.PI*Math.pow(squares.get(i).width()/2,2));
-                                float width = oval.width() + (float) (2*Math.sqrt(area/Math.PI))/10;
-                                oval.set(oval.left, oval.top, oval.left+width, oval.top+width);
+                        double d = Math.sqrt(Math.pow(oval.oval.centerX()-squares.get(i).centerX(),2)+Math.pow(oval.oval.centerY()-squares.get(i).centerY(),2));
+                        if (d < oval.getSize() + squares.get(i).width()/2){
+                            if (squares.get(i).width() <= oval.getSize()*2){
+                                // Calculate area of eaten square. Oval grows by that area
+                                oval.eat(squares.get(i).width()*squares.get(i).width());
+
+                                // Remove eaten polygon
                                 squares.remove(i);
                                 squareVels.remove(i);
                             }
@@ -326,7 +249,8 @@ public class Test2 extends Activity implements SensorEventListener{
                         }
                     }
                     
-                    size = round(oval.width(),2);
+                    // Calculate new radius of the oval. This will be the final score if player dies
+                    size = round(oval.getSize(),2);
                     
                 }
                 
@@ -336,27 +260,17 @@ public class Test2 extends Activity implements SensorEventListener{
                 canvasHeight = this.getHeight();
                 initialized = true;
                 
-                // setup controlled oval
-                // Set initial position at middle of screen
-                float xPos = (canvasWidth-oval.width())/2;
-                float yPos = (canvasHeight-oval.height())/2;
-                oval.set(
-                        xPos,
-                        yPos,
-                        xPos+oval.width(),
-                        yPos+oval.height()
-                );
+                // Setup controlled oval
+                // Places oval of radius 5 at center of screen
+                oval = new Player(canvasWidth/2, canvasHeight/2, 5.0f, canvasWidth, canvasHeight);
 
-                // Set initial velocity. Accelerometer movement will change the velocity
-                Test2.setXVel(0f);
-                Test2.setYVel(0f);
                 
-                // setup first 2 other ovals
+                // setup first 2 enemy polygons
                 // will be half size of controlled oval
-                squares.add(new RectF(0,0,oval.width()/2,oval.height()/2));
-                squares.add(new RectF(canvasWidth-oval.width()/2,0,canvasWidth,oval.height()/2));
+                squares.add(new RectF(0,0,oval.getSize(), oval.getSize()));
+                squares.add(new RectF(canvasWidth-oval.getSize(),0,canvasWidth,oval.getSize()));
                 
-                // setup vels for first 2 ovals
+                // setup vels for first 2 enemies
                 float[][] initOvalsTraj = {{1,1},{-1,1}};
                 squareVels.add(initOvalsTraj[0]);
                 squareVels.add(initOvalsTraj[1]);

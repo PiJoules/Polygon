@@ -29,6 +29,7 @@ public class Polygon{
 	// Check if the oval has collided with this polygon
 	public boolean detectCollisions(int radius, int xPos, int yPos){
 		// TODO: detect collisions. Ideally better than we currently are
+		return false; // Temporary
 	}
 
 	// Getter and setter methods for location variables

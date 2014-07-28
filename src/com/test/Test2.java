@@ -1,5 +1,6 @@
 package com.test;
 
+// these are various classes that are used
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -25,65 +26,93 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Random;
 
-/**
- *
- * @author Pi_Joules
- */
+
+// Test2 is the actual game of the app
+// Test2 is an activity since it is its own screen in the app
+// Test2 will be using methods in the SensorEventListener interface
+// since Test2 will be using the accelerometer as a controler
 public class Test2 extends Activity implements SensorEventListener{
     
-    // drawable stuff
+    // Custom view stuff
+    // Create a custom view called 'mCustomDrawableView' that will display the game
+    // mCustomDrawableView is a subclass created in this class to allow easier
+    // management of some variables
+    // The boolean variable 'paused' determines whether the game is paused or not
     private CustomDrawableView mCustomDrawableView;
     protected boolean paused = false;
     
-    // accelerometer stuff
+    // Accelerometer stuff
+    // The x,y,and z accelerometer data are saved as 'xAccel','yAccel',and 'zAccel'
+    // The accelerometer returns these as floats
+    // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
+    // The Sensor 'mAccelerometer' will be the accelerometer in the phone
     public float xAccel, yAccel, zAccel;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
-
-    // Oval size. Used to calculate score
+    
+    // This is the size of the oval that the user controls
     public float size;
 
+    // The onCreate method is what's called evertime the game launches
+    // The onCreate method is a method inherited from the parent class Activity
+    // Overriding it and other methods inherited from Activity will prevent
+    // from calling the same method in the parent class
+    // This is the same for methods implemented from the SensorEventListener
+    // interface also
+    // The Bundle allows for data to be transferred between activities
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
-        super.onCreate(savedInstanceState);
+    public void onCreate(Bundle savedInstanceState){
+        super.onCreate(savedInstanceState); // call the parent class' onCreate method
         
-        
-        //Remove title bar and notification bar
+        // hide the title bar
         requestWindowFeature(Window.FEATURE_NO_TITLE);
+        
+        // hide the notification bar
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
-        // set to landscape view
+        // lock the view to a vertical portrait orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
-        setContentView(R.layout.main);
+        // Set the current view that will be displayed on the phone
+        // to the layout created in the main.xml file located in the
+        // Resources/layout directory
+        //setContentView(R.layout.main); // may not need this since the contentview is set to mCustomDrawableView later
         
-        // accelerometer stuff
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        // initialize the accelerometer objects
+        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE); // enable the SensorManager
+        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER); // set the Sensor to the phone's accelerometer
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL); // have the SensorManager register and start gethering accelerometer data
         
-        // setup custom canvas
-        mCustomDrawableView = new CustomDrawableView(this);
+        // setup the custom canvas
+        mCustomDrawableView = new CustomDrawableView(this); // set the custom view that contains the game
+        
+        // Add an onClickListener to the custom view so that
+        // whenever the user taps on the screen, the game will pause
         mCustomDrawableView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 paused = !paused;
             }
         });
-        setContentView(mCustomDrawableView);
+        setContentView(mCustomDrawableView); // finally set the view of the game as the custom view
         
-        
+        // message to print once the onCreate method finishes
+        // and the game is done loading
         System.out.println("Loaded Game");
     }
     
+    
+    // method for quiting the game
+    // an alert message is displayed once the player loses
+    // and the user is prompted to enter their name and
+    // their score will be saved
     public void quitGame(){
-        final EditText input = new EditText(this);
-        input.setInputType(InputType.TYPE_CLASS_TEXT);
-        input.setHint("Enter name here to save score");
-        final ScoreManager sm = new ScoreManager(this);
-        new AlertDialog.Builder(this)
-                .setTitle("Max Size: " + String.format("%.2f",size))
-                .setView(input)
+        final EditText input = new EditText(this); // create a textfield where the user can enter their name
+        input.setInputType(InputType.TYPE_CLASS_TEXT); // allow only for text to be input
+        input.setHint("Enter name here to save score"); // set a placeholder that will disappear once the user enters text into the textbox
+        final ScoreManager sm = new ScoreManager(this); // the create a score manager object that will update the scores stroed on the phone
+        new AlertDialog.Builder(this) // create the alert message
+                .setTitle("Max Size: " + String.format("%.2f",size)) // set the title of the alert message to say the user's score
+                .setView(input) // add the text field to the alert message dialog box
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
                         String name = input.getText().toString();
@@ -227,7 +256,7 @@ public class Test2 extends Activity implements SensorEventListener{
                     }
 
                     p.setColor(Color.GREEN);
-                    canvas.drawRect(squares.get(i), p);
+                    canvas.drawRect(squares.get(i), p); // the rectangle will be drawn as a rectangle
                     
                     if (!paused){
                         // initially used intersect method, though was not very accurate for ovals

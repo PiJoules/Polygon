@@ -14,6 +14,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  *
@@ -71,20 +73,16 @@ public class ScoreManager {
     
     // check if new score is high enough to be saved
     public void checkNewScore(String name, String score){
-        boolean checking = true;
-        String[][] tempScores = new String[this.scores.length+1][this.scores[0].length];
-        for (int i = 0,j=0; i < tempScores.length; i++){
-            if (Double.parseDouble(score) > Double.parseDouble(this.scores[j][1]) && checking){
-                tempScores[i][0] = name;
-                tempScores[i][1] = score;
-                checking = false;
-            }
-            else {
-                tempScores[i] = this.scores[j++];
+        ArrayList<String[]> tempScores = new ArrayList<String[]>(Arrays.asList(scores));
+        for (int i = 0; i < tempScores.size(); i++){
+            if (Double.parseDouble(score) > Double.parseDouble(tempScores.get(i)[1])){
+                String[] nextScore = {name,score};
+                tempScores.add(i,nextScore);
+                break;
             }
         }
-        for (int i = 0; i < this.scores.length; i++){
-            this.scores[i] = tempScores[i];
+        for (int i = 0; i < scores.length; i++){
+            scores[i] = tempScores.get(i);
         }
         encodeScores();
     }

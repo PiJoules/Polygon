@@ -71,8 +71,8 @@ public class Player{
 
 
     // TODO: Use area of circle as mass?
-    // A function to move the oval at each timestep using accelerometer input
-    public void move(float xAccel, float yAccel){
+    // A function to move the oval at each timestep using accelerometer input contained in accel
+    public void move(float[] accel){
         // Calculate new velocity and position of oval
 
         // Calculate current velocity for determination of frictional force
@@ -92,8 +92,8 @@ public class Player{
         }
 
         // Compute new velocity by adding frictional force and accelerometer readings as another force
-        xVel = xVel + (xAccel + frictionX)/MASS;
-        yVel = yVel + (yAccel + frictionY)/MASS;
+        xVel = xVel + (accel[0] + frictionX)/MASS;
+        yVel = yVel + (accel[1] + frictionY)/MASS;
         
 
         // Set new position by moving oval in direction of its velocity

@@ -10,10 +10,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -32,7 +28,7 @@ import java.util.Iterator;
 // Test2 is an activity since it is its own screen in the app
 // Test2 will be using methods in the SensorEventListener interface
 // since Test2 will be using the accelerometer as a controler
-public class Test2 extends Activity implements SensorEventListener{
+public class Test2 extends Activity{
     
     // Custom view stuff
     // Create a custom view called 'mCustomDrawableView' that will display the game
@@ -42,17 +38,11 @@ public class Test2 extends Activity implements SensorEventListener{
     private CustomDrawableView mCustomDrawableView;
     protected boolean paused = false;
     
-    // Accelerometer stuff
-    // The x,y,and z accelerometer data are saved as 'xAccel','yAccel',and 'zAccel'
-    // The accelerometer returns these as floats
-    // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
-    // The Sensor 'mAccelerometer' will be the accelerometer in the phone
-    public float xAccel, yAccel, zAccel;
-    private SensorManager mSensorManager;
-    private Sensor mAccelerometer;
-    
     // This is the size of the oval that the user controls
     public float size;
+
+    // The accelerometer object
+    private Accelerometer accelSensor;
 
     // The onCreate method is what's called evertime the game launches
     // The onCreate method is a method inherited from the parent class Activity
@@ -78,12 +68,7 @@ public class Test2 extends Activity implements SensorEventListener{
         // to the layout created in the main.xml file located in the
         // Resources/layout directory
         //setContentView(R.layout.main); // may not need this since the contentview is set to mCustomDrawableView later
-        
-        // initialize the accelerometer objects
-        mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE); // enable the SensorManager
-        mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER); // set the Sensor to the phone's accelerometer
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL); // have the SensorManager register and start gethering accelerometer data
-        
+            
         // setup the custom canvas
         mCustomDrawableView = new CustomDrawableView(this); // set the custom view that contains the game
         
@@ -96,6 +81,9 @@ public class Test2 extends Activity implements SensorEventListener{
         });
         setContentView(mCustomDrawableView); // finally set the view of the game as the custom view
         
+        // Creates the accelerometer object. Passes this Activity to the constructor
+        accelSensor = new Accelerometer(this);
+
         // message to print once the onCreate method finishes
         // and the game is done loading
         System.out.println("Loaded Game");
@@ -126,31 +114,16 @@ public class Test2 extends Activity implements SensorEventListener{
     @Override
     protected void onResume() {
         super.onResume();
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        // Reregisters the accelerometer event listener
+        accelSensor.resume();
     }
     @Override
     protected void onPause() {
         super.onPause();
-        mSensorManager.unregisterListener(this);
+        // Stops the accelerometer event listener
+        accelSensor.pause();
     }
 
-    
-    // sensor methods
-    public void onSensorChanged(SensorEvent event) {
-        // Calculate net acceleration
-        float resultant = (float) Math.sqrt(event.values[0]*event.values[0] +
-                                            event.values[1]*event.values[1] + 
-                                            event.values[2]*event.values[2]);
-        
-        // Get accleration components. Scale by 9.81/resultant so net acceleration is 1g
-        xAccel = -event.values[0]/resultant*9.81f; // for xAccel, tilting right is negative, so take opposite
-        yAccel = event.values[1]/resultant*9.81f;
-        zAccel = event.values[2]/resultant*9.81f;    
-    }
-
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    
-    }
     
     // for rounding float to max of n decimal places
     public float round(float d, int decimalPlace){
@@ -227,7 +200,7 @@ public class Test2 extends Activity implements SensorEventListener{
                 if (!paused){
                     // Calculate new speed and position of player and move player
                     // Handled in player class
-                    oval.move(xAccel, yAccel);                    
+                    oval.move(accelSensor.getAccelFiltered());
                 }
                 
                 p.setColor(Color.BLACK);

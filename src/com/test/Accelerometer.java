@@ -87,11 +87,11 @@ public class Accelerometer implements SensorEventListener{
 
     // Getter methods for acceleration data. Returns an array
     public float[] getAccelFiltered(){
-        return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
+        return new float[]{xAccelFiltered, yAccelFiltered, zAccelFiltered};
     }
 
     public float[] getAccelUnfiltered(){
-        return new float[]{xAccelFiltered, yAccelFiltered, zAccelFiltered};
+        return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
     }
 
     // Getter and setter methods for alpha and threshold

@@ -1,25 +1,24 @@
 package com.test;
 
+
 import android.graphics.RectF;
+
 
 // An object representing the oval that the player controls
 public class Player{
 
-    // oval: The object representing the player that is drawn on the screen
+    // The object representing the player that is drawn on the screen
     public RectF oval; // Public so that main canvas can access it
 
-    // radius: The size of the oval. Grows as it absorbs other polygons
+    // The size of the oval. Grows as it absorbs other polygons
     private float radius;
-    // xPos, yPos: The current position of the oval
+    // The current position of the center of the oval
     private float xPos, yPos;
-    // xVel, yVel: The current velocity of the oval
+    // The current velocity of the oval
     private float xVel, yVel;
-    // canvasHeight, canvasWidth: The dimensions of the game screen
+    // The dimensions of the game screen
     private final float canvasWidth, canvasHeight;
 
-
-
-    // TODO: Set these according to a difficulty level?
     // Mass of oval. Used to calculate change in velocity
     private final float MASS = 10.0f;
     // Oval coefficient of restitution. Used in collisions with edge
@@ -46,9 +45,16 @@ public class Player{
 
 
     // Changes the size of the oval according to the area of the polygon it ate
-    public void eat(float area){
+    public boolean eat(Polygon square){
+        // Check if polygon is larger. If so, the oval dies
+        if(square.getLength() > 2.0f*radius){
+            return true; // Oval is dead, return true
+        }
+
+        // Calculate area of eaten square
+        float area = square.getLength()*square.getLength();
         // Calculate new area by adding one tenth the area of eaten polygon
-        float newArea = area/10 + (float) Math.PI*radius*radius;
+        float newArea = area/10.0f + (float) Math.PI*radius*radius;
         // Calculate new radius from new area
         float oldRadius = radius;
         radius = (float) Math.sqrt(newArea/Math.PI);
@@ -59,6 +65,8 @@ public class Player{
                  oval.top-radiusChange, 
                  oval.right+radiusChange, 
                  oval.bottom+radiusChange);
+
+        return false; // Oval is alive, return false
     }
 
 
@@ -90,8 +98,6 @@ public class Player{
 
         // Set new position by moving oval in direction of its velocity
         oval.offset(xVel, yVel);
-        this.updatePosition();
-
 
         // Check if oval has hit edge of screen
 
@@ -122,6 +128,10 @@ public class Player{
             // Reverse velocity and scale y velocity by coefficient of restitution
             yVel = -RESTITUTION*yVel;
         }
+
+        // Update xPos and yPos
+        this.updatePosition();
+
     }
 
 
@@ -132,11 +142,19 @@ public class Player{
     }
 
 
-    // Getter method for oval radius. TODO: Deprecate this
-    public float getSize(){
-        return radius;
+    // Getter methods for position
+    public float getX(){
+        return xPos;
     }
 
+    public float getY(){
+        return yPos;
+    }
+
+    // Getter method for oval radius
+    public float getRadius(){
+        return radius;
+    }
 
     // Getter and Setter methods for velocity
     public float getXVel(){

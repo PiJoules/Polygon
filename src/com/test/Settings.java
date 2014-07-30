@@ -3,6 +3,7 @@ package com.test;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
@@ -16,7 +17,7 @@ import android.widget.Button;
  */
 public class Settings extends Activity {
     
-    private Button clear, done;
+    private Button filter, clear, done;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -30,6 +31,14 @@ public class Settings extends Activity {
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
         setContentView(R.layout.settings_layout);
+        
+        filter = (Button) findViewById(R.id.filter);
+        filter.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent filterControl = new Intent(getApplicationContext(), FilterControl.class);
+                startActivity(filterControl);
+            }
+        });
         
         clear = (Button) findViewById(R.id.clear);
         clear.setOnClickListener(new View.OnClickListener() {

@@ -21,5 +21,8 @@
         <activity
             android:name="Settings">
         </activity>
+        <activity
+            android:name="FilterControl">
+        </activity>
     </application>
 </manifest>

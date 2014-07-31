@@ -9,6 +9,9 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -27,7 +30,7 @@ import java.util.Iterator;
 // Test2 is an activity since it is its own screen in the app
 // Test2 will be using methods in the SensorEventListener interface
 // since Test2 will be using the accelerometer as a controler
-public class Test2 extends Activity{
+public class Test2 extends Activity implements SensorEventListener{
     
     // Custom view stuff
     // Create a custom view called 'mCustomDrawableView' that will display the game
@@ -81,7 +84,7 @@ public class Test2 extends Activity{
         setContentView(mCustomDrawableView); // finally set the view of the game as the custom view
         
         // Creates the accelerometer object. Passes this Activity to the constructor
-        accelSensor = new Accelerometer(this);
+        accelSensor = new Accelerometer(this,this);
     }
     
     
@@ -125,6 +128,14 @@ public class Test2 extends Activity{
         BigDecimal bd = new BigDecimal(Float.toString(d));
         bd = bd.setScale(decimalPlace, BigDecimal.ROUND_HALF_UP);
         return bd.floatValue();
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        accelSensor.updateAccelVals(event);
+    }
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        
     }
 
 

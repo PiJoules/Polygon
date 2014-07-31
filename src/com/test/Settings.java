@@ -62,7 +62,6 @@ public class Settings extends Activity {
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
                         sm.clearData();
-                        System.out.println("Scores have been cleared.");
                     }
                 })
                 .setNegativeButton(android.R.string.no, null)

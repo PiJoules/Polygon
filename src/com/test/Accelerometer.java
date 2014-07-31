@@ -14,42 +14,54 @@ import android.hardware.SensorManager;
 import java.util.ArrayList;
 
 
-public class Accelerometer implements SensorEventListener{
+public class Accelerometer{
     // Accelerometer stuff
     // Accelerometer readings    
     private float xAccelFiltered, yAccelFiltered, zAccelFiltered, // Filtered sensor readings
                   xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered; // Unfiltered sensor readings
+    
     // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
     private SensorManager mSensorManager;
+    
     // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
     private Sensor mAccelerometer;
+    
+    private SensorEventListener sel;
 
     // Filtering settings
     // Static constants representing the filtering method. Used so other objects can easily switch
     // between filter modes using these constants
     public static final boolean EMA = true;
     public static final boolean SMA = false;
+    
     // Exponential moving average constant
     private float alpha;
+    
     // Averaging periods for SMA
     private int periods;
+    
     // An array list containing previous accelerometer readings. Each entry is a set of readings
     // containing x acceleration, y acceleration, and z acceleration in that order
     private ArrayList<float[]> pastData;
+    
     // boolean indicating whether or not filter should be used
     private boolean shouldFilter;
+    
     // boolean indicating which filter to use
     private boolean filterMode;
 
-    public Accelerometer(Activity a){
+    public Accelerometer(Activity a, SensorEventListener sel){
     	// Initialize the accelerometer objects
         // Create the sensor manager
         mSensorManager = (SensorManager) a.getSystemService(Context.SENSOR_SERVICE);
+        
         // Set the Sensor to the phone's accelerometer
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        
         // Have the SensorManager register and start gethering accelerometer data
         // Uses SENSOR_DELAY_GAME to obtain more frequent accelerometer readings (50 Hz)
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(sel, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        this.sel = sel;
 
         // Initialize accelerometer values
         xAccelFiltered = 0.0f;
@@ -68,18 +80,18 @@ public class Accelerometer implements SensorEventListener{
     }
 
     public void pause(){
-        mSensorManager.unregisterListener(this);
+        mSensorManager.unregisterListener(sel);
     }
 
     public void resume(){
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        mSensorManager.registerListener(sel, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
     
-
-    // Gets new accelerometer values and interprets and filters it
-    public void onSensorChanged(SensorEvent event) {
+    public void updateAccelVals(SensorEvent event){
+        
         // Check if pastData contains correct number of readings. Remove extras accoringly
         if(periods < pastData.size()){
+            
             // Too many readings, delete extra
             int excessReadings = pastData.size() - periods + 1; // + 1 because new reading will be added
             for(int i = 0; i < excessReadings; i++){
@@ -149,12 +161,6 @@ public class Accelerometer implements SensorEventListener{
         zAccelFiltered = zAccelFiltered/resultant*9.81f;
     }
 
-    // onAccuracyChanged is an abstract method of the SensorEventManager interface, so it must be
-    // implemented. However, no action is currently needed in this method
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    
-    }
-
     // Getter method for acceleration method that does not specify which data it wants
     public float[] getAccel(){
         // Filtering is on, return filtered data
@@ -192,6 +198,10 @@ public class Accelerometer implements SensorEventListener{
 
     public void setAlpha(float newAlpha){
         alpha = newAlpha;
+    }
+    
+    public void setShouldFilter(boolean set){
+        this.shouldFilter = set;
     }
 
     public int getPeriods(){

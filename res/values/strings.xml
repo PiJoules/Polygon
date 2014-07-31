@@ -1,4 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Polygon</string>
+    <string name="alpha_description">
+        The alpha filter returns a weighted sum of the new sensor value and old 
+        sensor value. Raising the value of alpha will give more weight to the 
+        accelerometer data and allow for more responsive controls. Decreasing 
+        alpha will give more weight to the previous filter value and allow for 
+        smoother controls.
+    </string>
+    <string name="sma_description">
+        The Simple Moving Average (SMA) Filter returns the average of the last 
+        N number of sensor values. Raising N increases the number of values that 
+        will be averaged and allow for smoother controls. Decreasing N lessens 
+        the number of values that will be averaged and allow for more responsive 
+        controls.
+    </string>
+    <string name="none_description">
+        Noise returned by the accelerometer will not be filtered out, but the 
+        controls will be very responsive and allow for more sudden movements.
+    </string>
 </resources>

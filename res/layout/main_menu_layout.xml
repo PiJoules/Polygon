@@ -6,7 +6,7 @@
     android:layout_height="fill_parent"
     android:gravity="center_vertical">
     <ImageView
-        android:src="@drawable/polygone"
+        android:src="@drawable/polygon"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
     </ImageView>

@@ -56,7 +56,7 @@ public class Settings extends Activity {
     }
     
     private void clearScores(){
-        final ScoreManager sm = new ScoreManager(this);
+        final ScoreManager sm = new ScoreManager(this,null);
         new AlertDialog.Builder(this)
                 .setTitle("Are you sure you want to delete your local scores?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){

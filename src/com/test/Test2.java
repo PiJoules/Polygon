@@ -9,7 +9,6 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.RectF;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.InputType;
@@ -94,7 +93,7 @@ public class Test2 extends Activity{
         final EditText input = new EditText(this); // create a textfield where the user can enter their name
         input.setInputType(InputType.TYPE_CLASS_TEXT); // allow only for text to be input
         input.setHint("Enter name here to save score"); // set a placeholder that will disappear once the user enters text into the textbox
-        final ScoreManager sm = new ScoreManager(this); // the create a score manager object that will update the scores stroed on the phone
+        final ScoreManager sm = new ScoreManager(this,null); // the create a score manager object that will update the scores stroed on the phone
         new AlertDialog.Builder(this) // create the alert message
                 .setTitle("Max Size: " + String.format("%.2f",size)) // set the title of the alert message to say the user's score
                 .setView(input) // add the text field to the alert message dialog box

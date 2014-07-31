@@ -10,7 +10,6 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TextView;
-import java.util.Arrays;
 
 /**
  *
@@ -56,7 +55,7 @@ public class MainMenu extends Activity {
     @Override
     protected void onResume(){
         super.onResume();
-        final ScoreManager sm = new ScoreManager(this);
+        final ScoreManager sm = new ScoreManager(this, null);
         String[][] scores = sm.getParsedScores();
         
         if (table == null){

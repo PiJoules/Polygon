@@ -2,20 +2,13 @@ package com.test;
 
 // Event imports
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.ActivityInfo;
 
 // Sensor imports
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-
-// OS imports
-import android.os.Bundle;
-import android.os.Handler;
 
 // Java imports
 import java.util.ArrayList;

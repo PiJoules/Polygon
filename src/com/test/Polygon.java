@@ -8,7 +8,7 @@ import android.graphics.RectF;
 public class Polygon{
 
     // Number of collisions with the edge of the screen before removing the polygon
-    private static final int COLLISION_LIMIT = 10;
+    private static final int COLLISION_LIMIT = 20;
 
     // A variable to track how many collisions have occured
     private int collisions;
@@ -146,8 +146,8 @@ public class Polygon{
         float dy = yPos - oval_y;
         float dist = (float) Math.sqrt(dx*dx + dy*dy);
         
-        // Check if oval and square intersected
-        if(dist < oval_radius){
+        // Check if oval and square intersected (distance between centers < radius oval +radius square)
+        if(dist < oval_radius+length/2.0f){
             // Intersection, return true
             return true;
         }

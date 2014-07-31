@@ -24,7 +24,7 @@ public class Player{
     // Oval coefficient of restitution. Used in collisions with edge
     private final float RESTITUTION = 0.4f;
     // A frictional coefficient. Allows more fine control at low speed
-    private final float VISCOSITY = 0.25f;    
+    private final float VISCOSITY = 0.20f;    
 
 
     public Player(float x, float y, float rad, float cWidth, float cHeight){

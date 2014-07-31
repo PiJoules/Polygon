@@ -69,6 +69,36 @@
         android:text="@string/alpha_description"
         android:layout_below="@id/filter_choices">
     </TextView>
+    <LinearLayout
+        android:id="@+id/filter_val_entry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/description"
+        android:background="#808080"
+        android:visibility="visible">
+        <TextView
+            android:id="@+id/filter_val_type"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Alpha: "
+            android:textSize="20dp">
+        </TextView>
+        <EditText
+            android:id="@+id/filter_val"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:text="0.5">
+        </EditText>
+    </LinearLayout>
+    <TextView
+        android:id="@+id/filter_val_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:visibility="visible"
+        android:text="@string/alpha_val_description"
+        android:layout_below="@id/filter_val_entry">
+    </TextView>
     <Button
         android:id="@+id/done"
         android:layout_width="fill_parent"

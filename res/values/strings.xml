@@ -19,4 +19,10 @@
         Noise returned by the accelerometer will not be filtered out, but the 
         controls will be very responsive and allow for more sudden movements.
     </string>
+    <string name="alpha_val_description">
+        Alpha can be range from 0.01 to 1.
+    </string>
+    <string name = "sma_val_description">
+        The number of values N can range from 1 to 5.
+    </string>
 </resources>

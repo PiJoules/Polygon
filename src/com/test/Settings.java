@@ -53,8 +53,6 @@ public class Settings extends Activity {
                 finish();
             }
         });
-        
-        System.out.println("Loaded Settings");
     }
     
     private void clearScores(){

@@ -51,8 +51,6 @@ public class MainMenu extends Activity {
                 startActivity(settingsScreen);
             }
         });
-        
-        System.out.println("Loaded Main Menu");
     }
     
     @Override
@@ -73,8 +71,6 @@ public class MainMenu extends Activity {
             tvs[i][0].setText(scores[i][0]);
             tvs[i][1].setText(scores[i][1]);
         }
-        
-        System.out.println("Contents of saved data: " + Arrays.deepToString(scores));
     }
     
 }

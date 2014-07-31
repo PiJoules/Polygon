@@ -24,5 +24,8 @@
         <activity
             android:name="FilterControl">
         </activity>
+        <activity
+            android:name="TimeSeriesActivity">
+        </activity>
     </application>
 </manifest>

@@ -83,10 +83,6 @@ public class Test2 extends Activity{
         
         // Creates the accelerometer object. Passes this Activity to the constructor
         accelSensor = new Accelerometer(this);
-
-        // message to print once the onCreate method finishes
-        // and the game is done loading
-        System.out.println("Loaded Game");
     }
     
     

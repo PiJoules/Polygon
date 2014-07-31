@@ -1,6 +1,7 @@
 package com.test;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
@@ -14,7 +15,7 @@ import android.widget.TextView;
 
 public class FilterControl extends Activity {
     
-    private Button alpha, sma, none, done;
+    private Button alpha, sma, none, accelerometer_test, done;
     private TextView filter_type, description, filter_val_type, filter_val_description;
     private EditText filter_val;
     private LinearLayout filter_val_entry;
@@ -76,6 +77,14 @@ public class FilterControl extends Activity {
                 description.setText(R.string.none_description);
                 filter_val_description.setVisibility(View.GONE);
                 filter_val_entry.setVisibility(View.GONE);
+            }
+        });
+        
+        accelerometer_test = (Button) findViewById(R.id.accelerometer_test);
+        accelerometer_test.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent plotTest = new Intent(getApplicationContext(), TimeSeriesActivity.class);
+                startActivity(plotTest);
             }
         });
         

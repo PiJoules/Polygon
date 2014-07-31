@@ -17,10 +17,12 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 
+// Java imports
+import java.util.ArrayList;
+
 
 public class Accelerometer implements SensorEventListener{
     // Accelerometer stuff
-
     // Accelerometer readings    
     private float xAccelFiltered, yAccelFiltered, zAccelFiltered, // Filtered sensor readings
                   xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered; // Unfiltered sensor readings
@@ -30,10 +32,21 @@ public class Accelerometer implements SensorEventListener{
     private Sensor mAccelerometer;
 
     // Filtering settings
-    // Moving average constant
+    // Static constants representing the filtering method. Used so other objects can easily switch
+    // between filter modes using these constants
+    public static final boolean EMA = true;
+    public static final boolean SMA = false;
+    // Exponential moving average constant
     private float alpha;
-    // Minimum accelerometer reading to consider non-zero
-    private float threshold;
+    // Averaging periods for SMA
+    private int periods;
+    // An array list containing previous accelerometer readings. Each entry is a set of readings
+    // containing x acceleration, y acceleration, and z acceleration in that order
+    private ArrayList<float[]> pastData;
+    // boolean indicating whether or not filter should be used
+    private boolean shouldFilter;
+    // boolean indicating which filter to use
+    private boolean filterMode;
 
     public Accelerometer(Activity a){
     	// Initialize the accelerometer objects
@@ -42,7 +55,8 @@ public class Accelerometer implements SensorEventListener{
         // Set the Sensor to the phone's accelerometer
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         // Have the SensorManager register and start gethering accelerometer data
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        // Uses SENSOR_DELAY_GAME to obtain more frequent accelerometer readings (50 Hz)
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
 
         // Initialize accelerometer values
         xAccelFiltered = 0.0f;
@@ -54,7 +68,10 @@ public class Accelerometer implements SensorEventListener{
 
         // Initialize filtering settings to default values
         alpha = 0.95f; // Large alpha for limited lag
-        threshold = 9.81f/1000.0f; // Small threshold to detect small rotations
+        periods = 5;   // Small to limit lag
+        pastData = new ArrayList<float[]>(); // Contains last [periods] readings
+        shouldFilter = true; // Filtering on by default
+        filterMode = EMA; // Default to EMA filter
     }
 
     public void pause(){
@@ -62,27 +79,97 @@ public class Accelerometer implements SensorEventListener{
     }
 
     public void resume(){
-        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
     
 
     // Gets new accelerometer values and interprets and filters it
     public void onSensorChanged(SensorEvent event) {
+        // Check if pastData contains correct number of readings. Remove extras accoringly
+        if(periods < pastData.size()){
+            // Too many readings, delete extra
+            int excessReadings = pastData.size() - periods + 1; // + 1 because new reading will be added
+            for(int i = 0; i < excessReadings; i++){
+                pastData.remove(0);
+            }
+        }
+        else if(periods == pastData.size()){
+            // Delete oldest reading
+            pastData.remove(0);
+        }
+        // Else, readings should only be added, so removing step is skipped
+
+        // Save raw unfiltered data
+        xAccelUnfiltered = -event.values[0]; // xAccel negated because tilting right is negative
+        yAccelUnfiltered = event.values[1];
+        zAccelUnfiltered = event.values[2];
+
+        // Add unfiltered data to history
+        pastData.add(new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered});
+
+        if(shouldFilter){
+            if(filterMode == EMA){
+                // Apply exponential moving average filter
+                xAccelFiltered = alpha*xAccelUnfiltered + (1.0f-alpha)*xAccelFiltered;
+                yAccelFiltered = alpha*yAccelUnfiltered + (1.0f-alpha)*yAccelFiltered;
+                zAccelFiltered = alpha*zAccelUnfiltered + (1.0f-alpha)*zAccelFiltered;
+            }
+            else{
+                // Apply simple moving average filter
+                // Summing variables
+                float xSum = 0;
+                float ySum = 0;
+                float zSum = 0;
+
+                // Sum past data
+                for(float[] data : pastData){
+                    xSum += data[0];
+                    ySum += data[1];
+                    zSum += data[2];
+                }
+                
+                // Calculate average acceleration                
+                xAccelFiltered = xSum/periods;
+                yAccelFiltered = ySum/periods;
+                zAccelFiltered = zSum/periods;
+            }
+        }
+        else{
+            // Filtering is off. Must set filtered readings, so they are set to unfiltered readings
+            xAccelFiltered = xAccelUnfiltered;
+            yAccelFiltered = yAccelUnfiltered;
+            zAccelFiltered = zAccelUnfiltered;
+        }
+
+        // Additional filtering needed for our app. Since the magnitude of the acceleration is not
+        // necesarilly 1g, the acceleration is scaled so that it is and the acceleration components
+        // act as tilt angles
+
         // Calculate net acceleration
-        float resultant = (float) Math.sqrt(event.values[0]*event.values[0] +
-                                            event.values[1]*event.values[1] + 
-                                            event.values[2]*event.values[2]);
+        float resultant = (float) Math.sqrt(xAccelFiltered*xAccelFiltered +
+                                            yAccelFiltered*yAccelFiltered + 
+                                            zAccelFiltered*zAccelFiltered);
         
         // Get accleration components. Scale by 9.81/resultant so net acceleration is 1g
-        xAccelFiltered = -event.values[0]/resultant*9.81f; // for xAccel, tilting right is negative, so take opposite
-        yAccelFiltered = event.values[1]/resultant*9.81f;
-        zAccelFiltered = event.values[2]/resultant*9.81f;
+        xAccelFiltered = xAccelFiltered/resultant*9.81f;
+        yAccelFiltered = yAccelFiltered/resultant*9.81f;
+        zAccelFiltered = zAccelFiltered/resultant*9.81f;
     }
 
     // onAccuracyChanged is an abstract method of the SensorEventManager interface, so it must be
     // implemented. However, no action is currently needed in this method
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
     
+    }
+
+    // Getter method for acceleration method that does not specify which data it wants
+    public float[] getAccel(){
+        // Filtering is on, return filtered data
+        if(shouldFilter){
+            return new float[]{xAccelFiltered, yAccelFiltered, zAccelFiltered};
+        }
+        // Filtering is off, return unfiltered data
+        return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
     }
 
     // Getter methods for acceleration data. Returns an array
@@ -94,7 +181,18 @@ public class Accelerometer implements SensorEventListener{
         return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
     }
 
-    // Getter and setter methods for alpha and threshold
+    // Getter and setter methods for filter mode
+    public boolean getFilter(){
+        return filterMode;
+    }
+
+    // Filter is defined by class constants EMA and SMA
+    public void setFilter(boolean filter){
+        filterMode = filter;
+    }
+    
+
+    // Getter and setter methods for alpha and SMA averaging periods
     public float getAlpha(){
         return alpha;
     }
@@ -103,12 +201,12 @@ public class Accelerometer implements SensorEventListener{
         alpha = newAlpha;
     }
 
-    public float getThreshold(){
-        return threshold;
+    public int getPeriods(){
+        return periods;
     }
 
-    public void getThreshold(float newThreshold){
-        threshold = newThreshold;
+    public void setPeriods(int newNum){
+        periods = newNum;
     }
 
 }

@@ -15,15 +15,13 @@ import java.util.ArrayList;
 
 
 public class Accelerometer{
-    // Accelerometer stuff
     // Accelerometer readings    
-    private float xAccelFiltered, yAccelFiltered, zAccelFiltered, // Filtered sensor readings
-                  xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered; // Unfiltered sensor readings
+    private float xAccelFiltered, yAccelFiltered, zAccelFiltered, // Filtered readings
+                  xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered; // Unfiltered readings
     
     // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
     private SensorManager mSensorManager;
-    
-    // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
+    // The accelerometer object which is used to get new readings
     private Sensor mAccelerometer;
     
     // The SensorEventListener 'sel' is required to enable and register sensors in the phone
@@ -51,10 +49,16 @@ public class Accelerometer{
     // boolean indicating which filter to use
     private boolean filterMode;
     
-    
 
+    /**
+    * Object Constructor. Initializes all variables needed to get accelerometer readings and apply
+    * appropriate filtering
+    * @param a: The Android screen that is using the accelerometer
+    * @param sel: The event handler for new accelerometer readings
+    */
     public Accelerometer(Activity a, SensorEventListener sel){
     	// Initialize the accelerometer objects
+
         // Create the sensor manager
         mSensorManager = (SensorManager) a.getSystemService(Context.SENSOR_SERVICE);
         
@@ -64,7 +68,9 @@ public class Accelerometer{
         // Have the SensorManager register and start gethering accelerometer data
         // Uses SENSOR_DELAY_GAME to obtain more frequent accelerometer readings (50 Hz)
         mSensorManager.registerListener(sel, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
+        // Saves the sensor event listener
         this.sel = sel;
+
 
         // Initialize accelerometer values
         xAccelFiltered = 0.0f;
@@ -82,17 +88,26 @@ public class Accelerometer{
         filterMode = EMA; // Default to EMA filter
     }
 
+
+    // Method called when the screen (Activity) is exited
     public void pause(){
+        // Stop event listener when app is not active to prevent unecessary cpu use
         mSensorManager.unregisterListener(sel);
     }
 
+    // Method called when the screen (Activity) is reopened
     public void resume(){
+        // Register event handler for sensor updates
         mSensorManager.registerListener(sel, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
+
     
-    // essentially the onSensorChange method
+    /**
+    * This method is called on every new accelerometer reading. It applies filtering according to
+    * the settings
+    * @param event: the actual event containing an array of the x, y, and z accelerations
+    */
     public void updateAccelVals(SensorEvent event){
-        
         // Check if pastData contains correct number of readings. Remove extras accoringly
         if(periods < pastData.size()){
             
@@ -116,7 +131,9 @@ public class Accelerometer{
         // Add unfiltered data to history
         pastData.add(new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered});
 
+        // Check if filtering is turned on
         if(shouldFilter){
+            // Filtering is on, check which type to use
             if(filterMode == EMA){
                 // Apply exponential moving average filter
                 xAccelFiltered = alpha*xAccelUnfiltered + (1.0f-alpha)*xAccelFiltered;
@@ -154,7 +171,7 @@ public class Accelerometer{
         // necesarilly 1g, the acceleration is scaled so that it is and the acceleration components
         // act as tilt angles
 
-        // Calculate net acceleration
+        // Calculate net acceleration by 
         float resultant = (float) Math.sqrt(xAccelFiltered*xAccelFiltered +
                                             yAccelFiltered*yAccelFiltered + 
                                             zAccelFiltered*zAccelFiltered);
@@ -165,15 +182,6 @@ public class Accelerometer{
         zAccelFiltered = zAccelFiltered/resultant*9.81f;
     }
 
-    // Getter method for acceleration method that does not specify which data it wants
-    public float[] getAccel(){
-        // Filtering is on, return filtered data
-        if(shouldFilter){
-            return new float[]{xAccelFiltered, yAccelFiltered, zAccelFiltered};
-        }
-        // Filtering is off, return unfiltered data
-        return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
-    }
 
     // Getter methods for acceleration data. Returns an array
     public float[] getAccelFiltered(){
@@ -181,6 +189,16 @@ public class Accelerometer{
     }
 
     public float[] getAccelUnfiltered(){
+        return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
+    }
+
+    // Getter method for acceleration method that does not specify which data it wants
+    public float[] getAccel(){
+        // Filtering is on, return filtered data
+        if(shouldFilter){
+            return new float[]{xAccelFiltered, yAccelFiltered, zAccelFiltered};
+        }
+        // Filtering is off, return unfiltered data
         return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
     }
 
@@ -203,14 +221,6 @@ public class Accelerometer{
     public void setAlpha(float newAlpha){
         alpha = newAlpha;
     }
-    
-    public void setShouldFilter(boolean set){
-        this.shouldFilter = set;
-    }
-    
-    public boolean getShouldFilter(){
-        return this.shouldFilter;
-    }
 
     public int getPeriods(){
         return periods;
@@ -220,4 +230,13 @@ public class Accelerometer{
         periods = newNum;
     }
 
+
+    // Getter and setter methods for whether or not filtering is on
+    public void setShouldFilter(boolean set){
+        this.shouldFilter = set;
+    }
+    
+    public boolean getShouldFilter(){
+        return this.shouldFilter;
+    }
 }

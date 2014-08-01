@@ -1,5 +1,6 @@
 package com.test;
 
+// Android imports
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -11,16 +12,15 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 
-/**
- *
- * @author Pi_Joules
- */
 public class Settings extends Activity {
-    
+    // Buttons on the settings screen    
     private Button filter, clear, done;
 
+    // This method creates the screen (Activity). It overrides the default creation method in the
+    // Activity class
     @Override
     public void onCreate(Bundle icicle) {
+        // Call onCreate method of Activity
         super.onCreate(icicle);
         
         //Remove title bar and notification bar
@@ -30,37 +30,53 @@ public class Settings extends Activity {
         // set to landscape view
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         
+        // Set GUI layout
         setContentView(R.layout.settings_layout);
-        
+
+        // Create filter button        
         filter = (Button) findViewById(R.id.filter);
+        // Create filter button handler
         filter.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                // Sends user to the filter control Activity
                 Intent filterControl = new Intent(getApplicationContext(), FilterControl.class);
                 startActivity(filterControl);
             }
         });
-        
+
+        // Create clear button        
         clear = (Button) findViewById(R.id.clear);
+        // Clear button handler
         clear.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+                // Deletes locally saved scores
                 clearScores();
             }
         });
-        
+
+        // Create done button        
         done = (Button) findViewById(R.id.done);
+        // Done button handler
         done.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v) {
+                // Exits this activity
                 finish();
             }
         });
     }
-    
+
+
+    // this method deletes the contents of the high scoes file using the ScoreManager    
     private void clearScores(){
         final ScoreManager sm = new ScoreManager(this,null);
+        // Create alert dialog box
         new AlertDialog.Builder(this)
+                // Set title message
                 .setTitle("Are you sure you want to delete your local scores?")
+                // Handler for "yes" button
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
+                        // Tells the ScoreManager to delete saved scores
                         sm.clearData();
                     }
                 })

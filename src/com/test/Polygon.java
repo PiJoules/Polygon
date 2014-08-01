@@ -29,7 +29,7 @@ public class Polygon{
     public RectF shape; // public so main canvas can access it
 
 
-    // Constructor
+    // Constructor. Spawns a square of side length len in a random corner with a velocity (vx, vy)
     public Polygon(float len, int corner, float vx, float vy, float cWidth, float cHeight){
         
         // Save the dimensions of the canvas for use in other methods

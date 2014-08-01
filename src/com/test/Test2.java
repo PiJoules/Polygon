@@ -1,6 +1,8 @@
 package com.test;
 
-// these are various classes that are used
+// These are various libraries that are used
+
+// Android imports
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -20,35 +22,37 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
 
+// Java imports
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Iterator;
 
 
-// Test2 is the actual game of the app
+// Test2 is the object that represents and controls the game the user plays
 // Test2 is an activity since it is its own screen in the app
-// Test2 will be using methods in the SensorEventListener interface
-// since Test2 will be using the accelerometer as a controler
+// It uses methods in the SensorEventListener interface since it uses the
+// accelerometer as a controler
 public class Test2 extends Activity implements SensorEventListener{
     
-    // Custom view stuff
+    // Custom view variables
     // Create a custom view called 'mCustomDrawableView' that will display the game
     // mCustomDrawableView is a subclass created in this class to allow easier
     // management of some variables
-    // The boolean variable 'paused' determines whether the game is paused or not
     private CustomDrawableView mCustomDrawableView;
+
+    // The boolean variable 'paused' determines whether the game is paused or not
     protected boolean paused = false;
     
     // This is the size of the oval that the user controls
     public float size;
 
-    // The accelerometer object
+    // The accelerometer object. This is used to get new accelerometer readings
     private Accelerometer accelSensor;
 
     // The onCreate method is what's called evertime the game launches
     // The onCreate method is a method inherited from the parent class Activity
-    // Overriding it and other methods inherited from Activity will prevent
+    // Overriding it and other methods inherited from Activity will prevent java
     // from calling the same method in the parent class
     // This is the same for methods implemented from the SensorEventListener
     // interface also
@@ -65,12 +69,7 @@ public class Test2 extends Activity implements SensorEventListener{
         
         // lock the view to a vertical portrait orientation
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-        
-        // Set the current view that will be displayed on the phone
-        // to the layout created in the main.xml file located in the
-        // Resources/layout directory
-        //setContentView(R.layout.main); // may not need this since the contentview is set to mCustomDrawableView later
-            
+                    
         // setup the custom canvas
         mCustomDrawableView = new CustomDrawableView(this); // set the custom view that contains the game
         
@@ -93,28 +92,48 @@ public class Test2 extends Activity implements SensorEventListener{
     // and the user is prompted to enter their name and
     // their score will be saved
     public void quitGame(){
-        final EditText input = new EditText(this); // create a textfield where the user can enter their name
-        input.setInputType(InputType.TYPE_CLASS_TEXT); // allow only for text to be input
-        input.setHint("Enter name here to save score"); // set a placeholder that will disappear once the user enters text into the textbox
-        final ScoreManager sm = new ScoreManager(this,null); // the create a score manager object that will update the scores stroed on the phone
-        new AlertDialog.Builder(this) // create the alert message
-                .setTitle("Max Size: " + String.format("%.2f",size)) // set the title of the alert message to say the user's score
-                .setView(input) // add the text field to the alert message dialog box
+        // Create a textfield where the user can enter their name
+        final EditText input = new EditText(this);
+        // Allow only for text to be input
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        // Set placeholder text that will disappear once the user enters something into the textbox
+        input.setHint("Enter name here to save score");
+        // Create a score manager object that will update the scores stored on the phone
+        final ScoreManager sm = new ScoreManager(this,null);
+        
+        // Create the alert message GUI that the user interacts with
+        new AlertDialog.Builder(this)
+                // set the title of the alert message to say the user's score
+                .setTitle("Max Size: " + String.format("%.2f",size))
+                // Add the text field to the alert message dialog box
+                .setView(input)
+                // Create the save button
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
+                        // Get the text the user entered
                         String name = input.getText().toString();
-                        sm.checkNewScore(name==null||"".equals(name)?"Anonymous":name, String.format("%.2f",size));
+                        // If the user did not enter a name, save them as "Anonymous"
+                        if(name == null || name.equals("")){
+                            name = "Anonymous";
+                        }
+                        // See if the score is high enough to add to the high scores list
+                        sm.checkNewScore(name, String.format("%.2f",size));
+                        // Exit alert message
                         finish();
                     }
                 }).show();
     }
     
+    // The method to be called when the user-reopens the app. Overrides the onResume method in
+    // Activity
     @Override
     protected void onResume() {
         super.onResume();
         // Reregisters the accelerometer event listener
         accelSensor.resume();
     }
+
+    // The method to be called when the screen is exited. Overrides the onPause method in Activity
     @Override
     protected void onPause() {
         super.onPause();
@@ -130,42 +149,51 @@ public class Test2 extends Activity implements SensorEventListener{
         return bd.floatValue();
     }
 
+    // The event handler for an accelerometer update. Calls the update method of the accelerometer
+    // class.
     public void onSensorChanged(SensorEvent event) {
         accelSensor.updateAccelVals(event);
     }
 
+    // The event handler for a change in the accelerometer settings. For this app, no action is 
+    // required in this method
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         
     }
 
 
-    // the game view
+    // The game view object
     private class CustomDrawableView extends View {
         
-        // canvas setup
-        public Paint p = new Paint();
-        public float canvasWidth, canvasHeight;
-        public boolean initialized = false; // make sure to get canvas width/height
+        // Canvas objects and variables
+        // The paint object colors the objects drawn on the screen
+        private Paint p = new Paint();
+        // The dimensions of the game screen
+        private float canvasWidth, canvasHeight;
+        // Boolean to check that the screen has been initialized
+        private boolean initialized = false;
         
         // The object representing the player character, an oval
         private Player oval;
 
-        // The squares that the player must avoid or eat. These are represented by the
-        // Polygon object and stored in an ArrayList for ease of additions and deletions
+        // The squares that the player must avoid or eat. These are represented by the Polygon
+        // object and stored in an ArrayList for ease of additions and deletions
         private ArrayList<Polygon> squares;
         // This is the maximum number of enemies that will be inclued on the canvas 
         private final int ENEMY_LIMIT = 10;
 
         // Debugging variables used for timing
-        private long peakFrameRate = 0;
-        private long minFrameRate = 1000;
+        private long peakFrameRate = 0; // Best frame rate attained
+        private long minFrameRate = 1000; // Worst frame rate attained
 
-
+        // The object constructor
         public CustomDrawableView(Context context) {
             super(context); // Calls the View super class constructor
+            
+            // Set background color
             this.setBackgroundColor(Color.WHITE);
             
-            // add circle every second
+            // Spawn a new thread to add a circle every second
             final Handler h = new Handler();
             new Thread(new Runnable(){
                 public void run() {
@@ -196,6 +224,9 @@ public class Test2 extends Activity implements SensorEventListener{
             }).start();
         }
         
+        // This is the method that is repeatedly called to redraw the game screen. It controls the
+        // overall flow of the game by moving the objects and removing them as necessary.
+        // Overrides the onDraw method of the view class
         @Override
         public void onDraw(Canvas canvas) {
             // Records the start time of this iteration of the function. For debugging purposes
@@ -212,7 +243,7 @@ public class Test2 extends Activity implements SensorEventListener{
                 p.setColor(Color.BLACK);
                 canvas.drawOval(oval.oval, p);
                 
-                // An iterator to move and check collisions for each square
+                // An iterator to go through the squares to move them and check collisions
                 Iterator<Polygon> iter = squares.iterator();
                 while(iter.hasNext()){
                     Polygon square = iter.next();

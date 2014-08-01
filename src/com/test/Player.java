@@ -1,6 +1,5 @@
 package com.test;
 
-
 import android.graphics.RectF;
 
 
@@ -27,6 +26,7 @@ public class Player{
     private final float VISCOSITY = 0.20f;    
 
 
+    // Class constructor. Creates a circle of radius rad at (x,y)
     public Player(float x, float y, float rad, float cWidth, float cHeight){
         xPos = x;
         yPos = y;
@@ -70,7 +70,6 @@ public class Player{
     }
 
 
-    // TODO: Use area of circle as mass?
     // A function to move the oval at each timestep using accelerometer input contained in accel
     public void move(float[] accel){
         // Calculate new velocity and position of oval

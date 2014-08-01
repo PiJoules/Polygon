@@ -1,5 +1,6 @@
 package com.test;
 
+// Android imports
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -11,17 +12,17 @@ import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TextView;
 
-/**
- *
- * @author Pi_Joules
- */
+// Activity for the main menu screen
 public class MainMenu extends Activity {
 
-    // xml stuff
+    // Buttons
     private Button play, settings;
+    // Table that shows the high scores and names
     private TableLayout table;
+    // The text fields containing the high scores and names
     private TextView[][] tvs;
     
+    // Method called when the main menu screen is created. Overrides onCreate method of Activity
     @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
@@ -35,29 +36,38 @@ public class MainMenu extends Activity {
         
         setContentView(R.layout.main_menu_layout);
         
+        // Play button that starts the game
         play = (Button) findViewById(R.id.play);
+        // Play button event handler
         play.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
                 Intent playScreen = new Intent(getApplicationContext(), Test2.class);
+                // Starts the game
                 startActivity(playScreen);
             }
         });
         
+        // Settings button that takes the player to the change settings screen
         settings = (Button) findViewById(R.id.settings);
+        // Settings button event handler
         settings.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Intent settingsScreen = new Intent(getApplicationContext(), Settings.class);
+                // Sends the user to the change settings screen
                 startActivity(settingsScreen);
             }
         });
     }
     
+
+    // Method called when the user reopens the app. Overrides the onResume method of Activity
     @Override
     protected void onResume(){
         super.onResume();
         final ScoreManager sm = new ScoreManager(this, null);
         String[][] scores = sm.getParsedScores();
         
+        // Create table if it doesn't already exist
         if (table == null){
             table = (TableLayout) findViewById(R.id.table);
             tvs = new TextView[scores.length][scores[0].length];
@@ -66,6 +76,7 @@ public class MainMenu extends Activity {
                 tvs[i][1] = (TextView) findViewById(R.id.name0 + 2*i+1);
             }
         }
+        // Show high scores and names
         for (int i = 0; i < scores.length; i++){
             tvs[i][0].setText(scores[i][0]);
             tvs[i][1].setText(scores[i][1]);

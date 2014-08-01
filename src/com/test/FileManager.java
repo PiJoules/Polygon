@@ -23,7 +23,7 @@ public class FileManager {
     
     private String fileName;
     private final Context context;
-    String contents = "";
+    private String contents = "";
     
     public FileManager(Context context, String fileName){
         this.fileName = fileName;

@@ -3,6 +3,9 @@ package com.test;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -13,12 +16,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 
-public class FilterControl extends Activity {
+public class FilterControl extends Activity implements SensorEventListener {
     
     private Button alpha, sma, none, accelerometer_test, done;
     private TextView filter_type, description, filter_val_type, filter_val_description;
     private EditText filter_val;
     private LinearLayout filter_val_entry;
+    private Accelerometer accel;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -44,39 +48,28 @@ public class FilterControl extends Activity {
         
         filter_val_entry = (LinearLayout) findViewById(R.id.filter_val_entry);
         
+        
         alpha = (Button) findViewById(R.id.alpha);
         alpha.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                filter_type.setText(alpha.getText());
-                description.setText(R.string.alpha_description);
-                filter_val_type.setText("Alpha: ");
-                filter_val.setText("0.5");
-                filter_val_description.setVisibility(View.VISIBLE);
-                filter_val_description.setText(R.string.alpha_val_description);
-                filter_val_entry.setVisibility(View.VISIBLE);
+                showAlphaInfo();
+                accel.saveAlpha();
             }
         });
         
         sma = (Button) findViewById(R.id.sma);
         sma.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                filter_type.setText(sma.getText());
-                description.setText(R.string.sma_description);
-                filter_val_type.setText("N: ");
-                filter_val.setText("3");
-                filter_val_description.setVisibility(View.VISIBLE);
-                filter_val_description.setText(R.string.sma_val_description);
-                filter_val_entry.setVisibility(View.VISIBLE);
+                showSMAInfo();
+                accel.saveSMA();
             }
         });
         
         none = (Button) findViewById(R.id.none);
         none.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                filter_type.setText(none.getText());
-                description.setText(R.string.none_description);
-                filter_val_description.setVisibility(View.GONE);
-                filter_val_entry.setVisibility(View.GONE);
+                showNoneInfo();
+                accel.saveNone();
             }
         });
         
@@ -94,6 +87,51 @@ public class FilterControl extends Activity {
                 finish();
             }
         });
+        
+        accel = new Accelerometer(this, this);
+        accel.setAccelFromFile();
+        if (accel.getShouldFilter()){
+            if (accel.getFilter()){
+                showAlphaInfo();
+            }
+            else showSMAInfo();
+        }
+        else showNoneInfo();
+    }
+    
+    private void showAlphaInfo(){
+        filter_type.setText(alpha.getText());
+        description.setText(R.string.alpha_description);
+        filter_val_type.setText("Alpha: ");
+        filter_val.setText(accel.getAlpha() + "");
+        filter_val_description.setVisibility(View.VISIBLE);
+        filter_val_description.setText(R.string.alpha_val_description);
+        filter_val_entry.setVisibility(View.VISIBLE);
+    }
+    
+    private void showSMAInfo(){
+        filter_type.setText(sma.getText());
+        description.setText(R.string.sma_description);
+        filter_val_type.setText("N: ");
+        filter_val.setText(accel.getPeriods() + "");
+        filter_val_description.setVisibility(View.VISIBLE);
+        filter_val_description.setText(R.string.sma_val_description);
+        filter_val_entry.setVisibility(View.VISIBLE);
+    }
+    
+    private void showNoneInfo(){
+        filter_type.setText(none.getText());
+        description.setText(R.string.none_description);
+        filter_val_description.setVisibility(View.GONE);
+        filter_val_entry.setVisibility(View.GONE);
+    }
+
+    public void onSensorChanged(SensorEvent event) {
+        
+    }
+
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        
     }
     
 }

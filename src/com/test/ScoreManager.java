@@ -33,7 +33,7 @@ public class ScoreManager extends FileManager {
         //String[] data = readSavedData().split(DELIMETER2);
         String[] data = null;
         if (readSavedData()){
-            data = this.contents.split(DELIMETER2);
+            data = this.getContents().split(DELIMETER2);
             for (int i = 0; i < data.length; i++){
                 s[i] = data[i].split(DELIMETER);
             }

@@ -26,13 +26,14 @@ public class Accelerometer{
     // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
     private Sensor mAccelerometer;
     
+    // The SensorEventListener 'sel' is required to enable and register sensors in the phone
     private SensorEventListener sel;
 
     // Filtering settings
     // Static constants representing the filtering method. Used so other objects can easily switch
     // between filter modes using these constants
-    public static final boolean EMA = true;
-    public static final boolean SMA = false;
+    public static final boolean EMA = true; // alpha
+    public static final boolean SMA = false; // sma
     
     // Exponential moving average constant
     private float alpha;
@@ -49,6 +50,9 @@ public class Accelerometer{
     
     // boolean indicating which filter to use
     private boolean filterMode;
+    
+    private final FileManager fm;
+    private final String ACCELFILE = "accelerometer.txt", DELIMETER = "#";
 
     public Accelerometer(Activity a, SensorEventListener sel){
     	// Initialize the accelerometer objects
@@ -77,6 +81,49 @@ public class Accelerometer{
         pastData = new ArrayList<float[]>(); // Contains last [periods] readings
         shouldFilter = true; // Filtering on by default
         filterMode = EMA; // Default to EMA filter
+        
+        fm = new FileManager(a, ACCELFILE);
+        if (!fm.readSavedData()) fm.writeData("alpha" + DELIMETER + "0.5");
+    }
+    
+    // sets the current accelerometer to what the file specifies
+    // either "alpha" (ema), "sma", or "none" followed by a value
+    public void setAccelFromFile(){
+        if (fm.readSavedData()){
+            String[] contents = fm.getContents().split(DELIMETER);
+            if ("alpha".equals(contents[0])){
+                setShouldFilter(true);
+                setFilter(EMA);
+                setAlpha(Float.parseFloat(contents[1]));
+            }
+            else if ("sma".equals(contents[0])){
+                setShouldFilter(true);
+                setFilter(SMA);
+                setPeriods(Integer.parseInt(contents[1]));
+            }
+            else if ("none".equals(contents[0])){
+                setShouldFilter(false);
+            }
+            else{
+                setShouldFilter(false);
+            }
+        }
+    }
+    
+    public boolean saveAlpha(){
+        return fm.writeData("alpha" + DELIMETER + String.format("%.2f", this.alpha));
+    }
+    
+    public boolean saveSMA(){
+        return fm.writeData("sma" + DELIMETER + this.periods);
+    }
+    
+    public boolean saveNone(){
+        return fm.writeData("none" + DELIMETER + 0);
+    }
+    
+    public String getAccelFileContents(){
+        return fm.getContents();
     }
 
     public void pause(){
@@ -87,6 +134,7 @@ public class Accelerometer{
         mSensorManager.registerListener(sel, mAccelerometer, SensorManager.SENSOR_DELAY_GAME);
     }
     
+    // essentially the onSensorChange method
     public void updateAccelVals(SensorEvent event){
         
         // Check if pastData contains correct number of readings. Remove extras accoringly
@@ -202,6 +250,10 @@ public class Accelerometer{
     
     public void setShouldFilter(boolean set){
         this.shouldFilter = set;
+    }
+    
+    public boolean getShouldFilter(){
+        return this.shouldFilter;
     }
 
     public int getPeriods(){

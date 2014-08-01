@@ -53,8 +53,8 @@ Dependencies
 
 AndroidSDK - http://developer.android.com/sdk/index.html
 
-    The Android SDK contains all the core libraries needed to begin programming an Android app in java
+  The Android SDK contains all the core libraries needed to begin programming an Android app in java
 
 AndroidPlot - http://androidplot.com/
 
-    AndroidPlot is used for visualization of accelerometer data. It includes utilities to easily create graphs and rolling plots. The compiled libraries are contained in libs/androidplot-core-0.6.1.jar
+  AndroidPlot is used for visualization of accelerometer data. It includes utilities to easily create graphs and rolling plots. The compiled libraries are contained in libs/androidplot-core-0.6.1.jar

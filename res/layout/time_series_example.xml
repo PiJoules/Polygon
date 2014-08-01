@@ -15,12 +15,22 @@
                 title="Plot title Go here"
                 renderMode="use_main_thread"/>
     </LinearLayout>
-    <Button
-        android:id="@+id/done"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="Done">
-    </Button>
+        android:layout_alignParentRight="true">
+        <Button
+            android:id="@+id/start_pause"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Pause">
+        </Button>
+        <Button
+            android:id="@+id/done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Done">
+        </Button>
+    </LinearLayout>
 </RelativeLayout>

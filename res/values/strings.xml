@@ -25,4 +25,7 @@
     <string name = "sma_val_description">
         The number of values N must be an integer and at least 1.
     </string>
+    <string name = "threshold_val_description">
+        Indicate the value of the threshold.
+    </string>
 </resources>

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.TextView;
 import com.androidplot.ui.AnchorPosition;
 import com.androidplot.ui.SizeLayoutType;
 import com.androidplot.ui.SizeMetrics;
@@ -27,16 +28,20 @@ import java.util.ArrayList;
 public class TimeSeriesActivity extends Activity implements SensorEventListener{
 
     private XYPlot plot;
-    private Button done, start_pause;
-    private ArrayList<Number> XAccel, YAccel, ZAccel;
-    private SimpleXYSeries XAccelSeries, YAccelSeries, ZAccelSeries;
+    private Button done, start_pause, reset, show_hide;
+    private TextView count;
+    private ArrayList<Number> XAccel, YAccel, ZAccel, threshold;
+    private SimpleXYSeries XAccelSeries, YAccelSeries, ZAccelSeries, thresholdSeries;
     private final int ARRAYSIZE = 100;
     private int sensorCount = 1;
     private Accelerometer accel;
     private boolean paused = false;
     private final ArrayList<Number> xRange = new ArrayList<Number>();
-    private LineAndPointFormatter XAccelFormat, YAccelFormat, ZAccelFormat;
+    private LineAndPointFormatter XAccelFormat, YAccelFormat, ZAccelFormat, thresholdFormat, hide;
     private AccelerometerFileManager afm;
+    private boolean showThreshold = true;
+    private int[] counts = new int[3];
+    private boolean[] highFlags = {false, false, false};
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -61,11 +66,13 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         XAccel = new ArrayList<Number>();
         YAccel = new ArrayList<Number>();
         ZAccel = new ArrayList<Number>();
+        threshold = new ArrayList<Number>();
         
         for (int i = 0; i < ARRAYSIZE; i++){
             XAccel.add(0);
             YAccel.add(0);
             ZAccel.add(0);
+            threshold.add(afm.getAccelData()[3]);
             xRange.add(sensorCount++);
         }
         
@@ -89,6 +96,31 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
                 }
             }
         });
+        
+        reset = (Button) findViewById(R.id.reset);
+        reset.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                counts[0] = 0;
+                counts[1] = 0;
+                counts[2] = 0;
+            }
+        });
+        
+        show_hide = (Button) findViewById(R.id.show_hide);
+        show_hide.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                if (showThreshold){
+                    show_hide.setText("Show");
+                    showThreshold = false;
+                }
+                else {
+                    show_hide.setText("Hide");
+                    showThreshold = true;
+                }
+            }
+        });
+        
+        count = (TextView) findViewById(R.id.count);
         
         plot = (XYPlot) findViewById(R.id.plot1);
         plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE));
@@ -123,6 +155,7 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         XAccelSeries = new SimpleXYSeries(xRange, XAccel, "XAccel");
         YAccelSeries = new SimpleXYSeries(xRange, YAccel, "YAccel");
         ZAccelSeries = new SimpleXYSeries(xRange, ZAccel, "ZAccel");
+        thresholdSeries = new SimpleXYSeries(xRange, threshold, "Threshold");
         
         XAccelFormat = new LineAndPointFormatter(
                 Color.RED,
@@ -142,6 +175,18 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
                 Color.TRANSPARENT,
                 null
         );
+        thresholdFormat = new LineAndPointFormatter(
+                Color.CYAN,
+                Color.CYAN,
+                Color.TRANSPARENT,
+                null
+        );
+        hide = new LineAndPointFormatter(
+                Color.TRANSPARENT,
+                Color.TRANSPARENT,
+                Color.TRANSPARENT,
+                null
+        );
         
     }
     
@@ -152,6 +197,8 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         plot.addSeries(XAccelSeries, XAccelFormat);
         plot.addSeries(YAccelSeries, YAccelFormat);
         plot.addSeries(ZAccelSeries, ZAccelFormat);
+        if (showThreshold) plot.addSeries(thresholdSeries, thresholdFormat);
+        else plot.addSeries(thresholdSeries, hide);
 
         plot.redraw();
     }
@@ -162,9 +209,38 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
             XAccelSeries.addLast(sensorCount, accel.getAccel()[0]);
             YAccelSeries.addLast(sensorCount, accel.getAccel()[1]);
             ZAccelSeries.addLast(sensorCount, accel.getAccel()[2]);
+            thresholdSeries.addLast(sensorCount, afm.getAccelData()[3]);
             XAccelSeries.removeFirst();
             YAccelSeries.removeFirst();
             ZAccelSeries.removeFirst();
+            thresholdSeries.removeFirst();
+            
+            if (showThreshold){
+                if (accel.getAccel()[0] > afm.getAccelData()[3] && !highFlags[0]){
+                    counts[0]++;
+                    highFlags[0] = true;
+                }
+                else if (accel.getAccel()[0] <= afm.getAccelData()[3] && highFlags[0]){
+                    highFlags[0] = false;
+                }
+                if (accel.getAccel()[1] > afm.getAccelData()[3] && !highFlags[1]){
+                    counts[1]++;
+                    highFlags[1] = true;
+                }
+                else if (accel.getAccel()[1] <= afm.getAccelData()[3] && highFlags[1]){
+                    highFlags[1] = false;
+                }
+                if (accel.getAccel()[2] > afm.getAccelData()[3] && !highFlags[2]){
+                    counts[2]++;
+                    highFlags[2] = true;
+                }
+                else if (accel.getAccel()[2] <= afm.getAccelData()[3] && highFlags[2]){
+                    highFlags[2] = false;
+                }
+            }
+            
+            count.setText("x:" + counts[0] + " y:" + counts[1] + " z:" + counts[2]);
+            
             sensorCount++;
             graph();
         }

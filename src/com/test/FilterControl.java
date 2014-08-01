@@ -22,7 +22,7 @@ public class FilterControl extends Activity implements SensorEventListener {
     
     private Button alpha, sma, none, accelerometer_test, done;
     private TextView filter_type, description, filter_val_type, filter_val_description;
-    private EditText filter_val;
+    private EditText filter_val, threshold_val;
     private LinearLayout filter_val_entry;
     private AccelerometerFileManager afm;
 
@@ -44,6 +44,8 @@ public class FilterControl extends Activity implements SensorEventListener {
         afm = new AccelerometerFileManager(this, "");
         
         filter_val = (EditText) findViewById(R.id.filter_val);
+        threshold_val = (EditText) findViewById(R.id.threshold_val);
+        threshold_val.setText(afm.getAccelData()[3] + "");
         
         filter_type = (TextView) findViewById(R.id.filter_type);
         description = (TextView) findViewById(R.id.description);
@@ -56,7 +58,7 @@ public class FilterControl extends Activity implements SensorEventListener {
         alpha.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showAlphaInfo();
-                afm.changeAccelFileContents(1, afm.getAccelData()[1], (int)afm.getAccelData()[2]);
+                afm.changeAccelFileContents(1, afm.getAccelData()[1], (int)afm.getAccelData()[2], afm.getAccelData()[3]);
             }
         });
         
@@ -64,7 +66,7 @@ public class FilterControl extends Activity implements SensorEventListener {
         sma.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showSMAInfo();
-                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)afm.getAccelData()[2]);
+                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)afm.getAccelData()[2], afm.getAccelData()[3]);
             }
         });
         
@@ -72,7 +74,7 @@ public class FilterControl extends Activity implements SensorEventListener {
         none.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 showNoneInfo();
-                afm.changeAccelFileContents(0, afm.getAccelData()[1], (int)afm.getAccelData()[2]);
+                afm.changeAccelFileContents(0, afm.getAccelData()[1], (int)afm.getAccelData()[2], afm.getAccelData()[3]);
             }
         });
         
@@ -143,47 +145,50 @@ public class FilterControl extends Activity implements SensorEventListener {
     }
     
     private boolean saveAllData(){
+        if ("".equals(filter_val.getText().toString())) filter_val.setText("1");
+        if ("".equals(threshold_val.getText().toString())) threshold_val.setText("5.0");
         float val = Float.parseFloat(filter_val.getText().toString());
+        float tval = Float.parseFloat(threshold_val.getText().toString());
         if (afm.getFilterType() == 0){
-            afm.changeAccelFileContents(0, afm.getAccelData()[1], (int) afm.getAccelData()[2]);
+            afm.changeAccelFileContents(0, afm.getAccelData()[1], (int) afm.getAccelData()[2], tval);
         }
         else if (afm.getFilterType() == 1){
             if (val < 0.01){
                 val = 0.01f;
-                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2]);
+                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2], tval);
                 filter_val.setText(val+"");
                 createAlertDialog("Alpha was set to 0.01 since alpha cannot be less than 0.01.");
                 return false;
             }
             else if (val > 1){
                 val = 1f;
-                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2]);
+                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2], tval);
                 filter_val.setText(val+"");
                 createAlertDialog("Alpha was set to 1 since alpha cannot be greater than 1.");
                 return false;
             }
             else {
-                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2]);
+                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2], tval);
                 return true;
             }
         }
         else if (afm.getFilterType() == 2){
             if (val < 1){
                 val = 1;
-                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val);
+                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val, tval);
                 filter_val.setText(val+"");
                 createAlertDialog("N was set to 1 since N cannot be less than 1.");
                 return false;
             }
             else if (val%1 != 0){
                 val = Math.round(val);
-                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val);
+                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val, tval);
                 filter_val.setText(val+"");
                 createAlertDialog("N was rounded since N must be an integer.");
                 return false;
             }
             else {
-                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val);
+                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val, tval);
                 return true;
             }
         }

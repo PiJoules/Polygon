@@ -16,7 +16,7 @@ public class AccelerometerFileManager extends FileManager {
     
     private final String ACCELFILE = "accel.txt";
     private String accelContents = "";
-    private float[] accelData = new float[3]; // 0 -> filterType, 1 -> alpha val, 2 -> sma count
+    private float[] accelData = new float[4]; // 0 -> filterType, 1 -> alpha val, 2 -> sma count
 
     public AccelerometerFileManager(Context context, String fileName) {
         super(context, fileName);
@@ -43,21 +43,23 @@ public class AccelerometerFileManager extends FileManager {
     }
     
     // 0 = no filter, 1 = alpha, 2 = sma
-    public void changeAccelFileContents(int filterType, float alpha, int sma){
+    public void changeAccelFileContents(int filterType, float alpha, int sma, float threshold){
         String content =
                 "filterType" + DELIMETER + filterType + DELIMETER2 +
                 "alpha" + DELIMETER + alpha + DELIMETER2 +
-                "sma" + DELIMETER + sma
+                "sma" + DELIMETER + sma + DELIMETER2 +
+                "threshold" + DELIMETER + threshold
                 ;
         this.accelContents = content;
         accelData[0] = (float) filterType;
         accelData[1] = alpha;
         accelData[2] = (float) sma;
+        accelData[3] = threshold;
         writeData(content);
     }
     
     public void clearAccelFile(){
-        changeAccelFileContents(0, 1f, 1);
+        changeAccelFileContents(0, 1f, 1, 5f);
     }
     
     public int getFilterType(){

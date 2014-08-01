@@ -39,7 +39,8 @@
         android:id="@+id/filter_choices"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/filter_select">
+        android:layout_below="@id/filter_select"
+        android:layout_marginTop="10dp">
         <Button
             android:id="@+id/alpha"
             android:layout_width="match_parent"
@@ -73,6 +74,7 @@
         android:id="@+id/filter_val_entry"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_below="@id/description"
         android:background="#808080"
         android:visibility="visible">
@@ -99,19 +101,46 @@
         android:text="@string/alpha_val_description"
         android:layout_below="@id/filter_val_entry">
     </TextView>
+    <LinearLayout
+        android:id="@+id/threshold_val_entry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/filter_val_description"
+        android:background="#808080"
+        android:visibility="visible">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Threshold: "
+            android:textSize="20dp">
+        </TextView>
+        <EditText
+            android:id="@+id/threshold_val"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:text="5.0">
+        </EditText>
+    </LinearLayout>
+    <TextView
+        android:layout_below="@id/threshold_val_entry"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/threshold_val_description">
+    </TextView>
+    <Button
+        android:id="@+id/done"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:text="Done">
+    </Button>
     <Button
         android:id="@+id/accelerometer_test"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Test Accelerometer"
-        android:layout_below="@id/filter_val_description">
-    </Button>
-    <Button
-        android:id="@+id/done"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:gravity="center"
-        android:text="Done">
+        android:layout_above="@id/done"
+        android:text="Test Accelerometer">
     </Button>
 </RelativeLayout>

@@ -24,6 +24,7 @@ public class FileManager {
     private String fileName;
     private final Context context;
     private String contents = "";
+    public final String DELIMETER = "#", DELIMETER2 = "##";
     
     public FileManager(Context context, String fileName){
         this.fileName = fileName;

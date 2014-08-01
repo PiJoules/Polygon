@@ -36,6 +36,7 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
     private boolean paused = false;
     private final ArrayList<Number> xRange = new ArrayList<Number>();
     private LineAndPointFormatter XAccelFormat, YAccelFormat, ZAccelFormat;
+    private AccelerometerFileManager afm;
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -54,6 +55,8 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         
         accel = new Accelerometer(this,this);
         accel.setShouldFilter(false);
+        
+        afm = new AccelerometerFileManager(this, "");
         
         XAccel = new ArrayList<Number>();
         YAccel = new ArrayList<Number>();
@@ -98,7 +101,23 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         plot.getLegendWidget().setAnchor(AnchorPosition.RIGHT_BOTTOM);
         plot.setRangeLabel("Acceleration (m/s^2)");
         plot.setDomainLabel("Data Point Number");
-        plot.setTitle("Raw Accelerometer Data");
+        
+        if (afm.getFilterType() == 0){
+            plot.setTitle("Raw Accelerometer Data");
+            accel.setShouldFilter(false);
+        }
+        else if (afm.getFilterType() == 1){
+            plot.setTitle("Alpha Filter Ouput with Alpha Value (" + afm.getAccelData()[1] + ")");
+            accel.setShouldFilter(true);
+            accel.setFilter(true);
+            accel.setAlpha(afm.getAccelData()[1]);
+        }
+        else if (afm.getFilterType() == 2){
+            plot.setTitle("SMA Filter Ouput with Period Count of (" + afm.getAccelData()[2] + ")");
+            accel.setShouldFilter(true);
+            accel.setFilter(false);
+            accel.setPeriods((int) afm.getAccelData()[2]);
+        }
         
         // create XYSeries from xRange and 
         XAccelSeries = new SimpleXYSeries(xRange, XAccel, "XAccel");

@@ -51,8 +51,7 @@ public class Accelerometer{
     // boolean indicating which filter to use
     private boolean filterMode;
     
-    private final FileManager fm;
-    private final String ACCELFILE = "accelerometer.txt", DELIMETER = "#";
+    
 
     public Accelerometer(Activity a, SensorEventListener sel){
     	// Initialize the accelerometer objects
@@ -81,49 +80,6 @@ public class Accelerometer{
         pastData = new ArrayList<float[]>(); // Contains last [periods] readings
         shouldFilter = true; // Filtering on by default
         filterMode = EMA; // Default to EMA filter
-        
-        fm = new FileManager(a, ACCELFILE);
-        if (!fm.readSavedData()) fm.writeData("alpha" + DELIMETER + "0.5");
-    }
-    
-    // sets the current accelerometer to what the file specifies
-    // either "alpha" (ema), "sma", or "none" followed by a value
-    public void setAccelFromFile(){
-        if (fm.readSavedData()){
-            String[] contents = fm.getContents().split(DELIMETER);
-            if ("alpha".equals(contents[0])){
-                setShouldFilter(true);
-                setFilter(EMA);
-                setAlpha(Float.parseFloat(contents[1]));
-            }
-            else if ("sma".equals(contents[0])){
-                setShouldFilter(true);
-                setFilter(SMA);
-                setPeriods(Integer.parseInt(contents[1]));
-            }
-            else if ("none".equals(contents[0])){
-                setShouldFilter(false);
-            }
-            else{
-                setShouldFilter(false);
-            }
-        }
-    }
-    
-    public boolean saveAlpha(){
-        return fm.writeData("alpha" + DELIMETER + String.format("%.2f", this.alpha));
-    }
-    
-    public boolean saveSMA(){
-        return fm.writeData("sma" + DELIMETER + this.periods);
-    }
-    
-    public boolean saveNone(){
-        return fm.writeData("none" + DELIMETER + 0);
-    }
-    
-    public String getAccelFileContents(){
-        return fm.getContents();
     }
 
     public void pause(){

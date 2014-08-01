@@ -9,7 +9,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.LinearLayout;
+import com.androidplot.ui.SizeLayoutType;
+import com.androidplot.ui.SizeMetrics;
 import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYSeries;
 import com.androidplot.xy.*;
@@ -20,8 +23,10 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
 
     private XYPlot plot;
     private LinearLayout screen;
+    private Button done;
     private ArrayList<Number> series1Numbers;
     private Accelerometer accel;
+    private ArrayList<Number> xRange = new ArrayList<Number>();
 
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -34,7 +39,7 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
         // lock the view to a vertical portrait orientation
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
         
         setContentView(R.layout.time_series_example);
         
@@ -42,6 +47,13 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         accel.setShouldFilter(false);
         
         series1Numbers = new ArrayList<Number>();
+        
+        done = (Button) findViewById(R.id.done);
+        done.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                finish();
+            }
+        });
         
         screen = (LinearLayout) findViewById(R.id.screen);
         screen.setOnClickListener(new View.OnClickListener() {
@@ -51,6 +63,9 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         });
         
         plot = (XYPlot) findViewById(R.id.plot1);
+        plot.getGraphWidget().setSize(new SizeMetrics(1f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE));
+        plot.setRangeUpperBoundary(10, BoundaryMode.FIXED);
+        plot.setRangeLowerBoundary(-10, BoundaryMode.FIXED);
         
     }
     
@@ -59,31 +74,24 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
 
         series1Numbers.add(accel.getAccel()[0]);
         series1Numbers.remove(0);
-
-        // Turn the above arrays into XYSeries':
-        XYSeries series1 = new SimpleXYSeries(
-                series1Numbers,          // SimpleXYSeries takes a List so turn our array into a List
-                SimpleXYSeries.ArrayFormat.Y_VALS_ONLY, // Y_VALS_ONLY means use the element index as the x value
-                "Series1");                             // Set the display title of the series
+        
+        XYSeries accelData = new SimpleXYSeries(xRange, series1Numbers, "XAccel");
 
         // Create a formatter to use for drawing a series using LineAndPointRenderer
         // and configure it from xml:
         LineAndPointFormatter series1Format = new LineAndPointFormatter();
 
         // add a new series' to the xyplot:
-        plot.addSeries(series1, series1Format);
-
-        // reduce the number of range labels
-        plot.setTicksPerRangeLabel(3);
-        //plot.getGraphWidget().setDomainLabelOrientation(-45);
+        plot.addSeries(accelData, series1Format);
 
         plot.redraw();
     }
 
     public void onSensorChanged(SensorEvent event) {
         accel.updateAccelVals(event);
-        if (series1Numbers.size() < 5){
+        if (series1Numbers.size() < 10){
             series1Numbers.add(accel.getAccelUnfiltered()[0]);
+            xRange.add(series1Numbers.size());
         }
         else{
             graph();

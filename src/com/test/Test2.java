@@ -50,6 +50,7 @@ public class Test2 extends Activity implements SensorEventListener{
     // The accelerometer object. This is used to get new accelerometer readings
     private Accelerometer accelSensor;
 
+
     // The onCreate method is what's called evertime the game launches
     // The onCreate method is a method inherited from the parent class Activity
     // Overriding it and other methods inherited from Activity will prevent java
@@ -178,54 +179,31 @@ public class Test2 extends Activity implements SensorEventListener{
 
         // The squares that the player must avoid or eat. These are represented by the Polygon
         // object and stored in an ArrayList for ease of additions and deletions
-        //private ArrayList<Polygon> squares;
-        private ArrayList<Polygon2> polygons;
+        private ArrayList<Polygon> squares;
         // This is the maximum number of enemies that will be inclued on the canvas 
         private final int ENEMY_LIMIT = 10;
 
-        // Debugging variables used for timing
-        private long peakFrameRate = 0; // Best frame rate attained
-        private long minFrameRate = 1000; // Worst frame rate attained
+        // To keep the time between each movement constant, we use a frame rate so that the screen
+        // will only redraw itself at set intervals and sleep if it completes drawing before the 
+        // time is up in an iteration
+        private final long FRAME_PERIOD = 1000/40;
 
-        // The object constructor
+        private int misses = 0;
+        private int total = 0;
+
+        private long currentTime = System.currentTimeMillis();
+        private long nextReDrawTime = currentTime + FRAME_PERIOD;
+        private long nextAddition = System.currentTimeMillis() + 1000;
+
+        // The object constructors
         public CustomDrawableView(Context context) {
             super(context); // Calls the View super class constructor
             
             // Set background color
             this.setBackgroundColor(Color.WHITE);
-            
-            // Spawn a new thread to add a circle every second
-            final Handler h = new Handler();
-            new Thread(new Runnable(){
-                public void run() {
-                    while (true){
-                        try{
-                            Thread.sleep(1000);
-                            h.post(new Runnable(){
-                                public void run(){
-                                    // Spawns a new enemy if there are less than 10 on canvas
-                                    //if (squares.size() < ENEMY_LIMIT){
-                                    if (polygons.size() < ENEMY_LIMIT){
-                                        Random r = new Random();
-                                        // Assigns the new square a width between 50% and 150% of oval's width
-                                        float nextWidth = r.nextFloat()*oval.getRadius()*2+oval.getRadius();
-                                        // Picks a random corner to spawn the new square
-                                        int nextCorner = r.nextInt(4);
-                                        int nextSides = r.nextInt(5)+1;
-                                        // Adds the new square to the ArrayList of enemies. Assigns it a random
-                                        // x and y velocity between .5 and 2.5
-                                        //squares.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight));
-                                        polygons.add(new Polygon2(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight, nextSides));
-                                    }
-                                }
-                            });
-                        }
-                        catch (InterruptedException e){
-                            // handle exceptions
-                        }
-                    }
-                }
-            }).start();
+
+            // Initialize squares list
+            squares = new ArrayList<Polygon>();
         }
         
         // This is the method that is repeatedly called to redraw the game screen. It controls the
@@ -233,8 +211,6 @@ public class Test2 extends Activity implements SensorEventListener{
         // Overrides the onDraw method of the view class
         @Override
         public void onDraw(Canvas canvas) {
-            // Records the start time of this iteration of the function. For debugging purposes
-            long startTime = System.currentTimeMillis();
 
             if (initialized){
                 
@@ -242,26 +218,37 @@ public class Test2 extends Activity implements SensorEventListener{
                     // Calculate new speed and position of player and move player
                     // Handled in player class
                     oval.move(accelSensor.getAccelFiltered());
+
+                    if(squares.size() < ENEMY_LIMIT && System.currentTimeMillis() > nextAddition){
+                        nextAddition = System.currentTimeMillis() + 1000;
+                        Random r = new Random();
+                        // Assigns the new square a width between 50% and 150% of oval's width
+                        float nextWidth = r.nextFloat()*oval.getRadius()*2+oval.getRadius();
+                        // Picks a random corner to spawn the new square
+                        int nextCorner = r.nextInt(4);
+                        // Adds the new square to the ArrayList of enemies. Assigns it a random
+                        // x and y velocity between .5 and 2.5
+                        squares.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight));
+                    }
                 }
                 
                 p.setColor(Color.BLACK);
                 canvas.drawOval(oval.oval, p);
                 
                 // An iterator to go through the squares to move them and check collisions
-                //Iterator<Polygon> iter = squares.iterator();
-                Iterator<Polygon2> iter = polygons.iterator();
+                Iterator<Polygon> iter = squares.iterator();
+                int i = 0;
                 while(iter.hasNext()){
-                    //Polygon square = iter.next();
-                    Polygon2 polygon = iter.next();
+                    Polygon square = iter.next();
+                    canvas.drawText(Float.toString(square.getX()) + " " + Float.toString(square.getY()),10,10*i+20,p);
+                    i++;
                 
                     if (!paused){
                         // Call each enemy's move method. Returns whether or not polygon should be removed
-                        //boolean shouldRemove = square.move();
-                        boolean shouldRemove = polygon.move();
+                        boolean shouldRemove = square.move();
 
                         // Check if the oval is intersecting the square. Returns the result of collission checking
-                        //boolean collided = square.checkCollisions(oval.getX(), oval.getY(), oval.getRadius());
-                        boolean collided = polygon.checkCollisions(oval.getX(), oval.getY(), oval.getRadius());
+                        boolean collided = square.checkCollisions(oval.getX(), oval.getY(), oval.getRadius());
 
                         // Polygon has stayed past collision limiy. Only remove immediately if it
                         // hasn't also collided with the oval
@@ -301,41 +288,38 @@ public class Test2 extends Activity implements SensorEventListener{
                 
             }
             else {
-
                 // Save dimensions of canvas
                 canvasWidth = this.getWidth();
                 canvasHeight = this.getHeight();
+                
                 initialized = true;
                 
                 // Setup controlled oval
                 // Place an oval of radius 5 at center of screen
                 size = 5.0f;
                 oval = new Player(canvasWidth/2, canvasHeight/2, size, canvasWidth, canvasHeight);
-
-                // Initialize squares list
-                squares = new ArrayList<Polygon>();
-
             }
-            
+    
+
+            // Sleep until next frame
+            total++;
+            currentTime = System.currentTimeMillis();
+            try{
+                if(nextReDrawTime - currentTime < 0){
+                    misses++;
+                }
+                Thread.sleep(Math.max(0,nextReDrawTime - currentTime));
+            }
+            catch(InterruptedException e){
+                return;
+            }
+
+            canvas.drawText(Float.toString(((float) misses)/((float) total)), 10, 10, p);
+            // Calculate end of next redraw period
+            nextReDrawTime = currentTime + FRAME_PERIOD;
+
             // redraw on canvas
             invalidate();
-            
-
-            // Debugging code. Calculates current frame rate from execution time of onDraw()
-            long currentFrameRate = 1000/Math.max(1,(System.currentTimeMillis() - startTime)); // Prevent divide by zero
-            
-            // Determine if frame rate exceeds slowest or fastest rates observed
-            if(currentFrameRate < minFrameRate){
-                minFrameRate = currentFrameRate;
-            }
-            if(currentFrameRate > peakFrameRate){
-                peakFrameRate = currentFrameRate;
-            }
-
-            // Output debugging text to screen
-            canvas.drawText("Frame Rate: " + Long.toString(currentFrameRate) + "fps", 10, 10, p);
-            canvas.drawText("Peak Rate: " + Long.toString(peakFrameRate) + "fps", 10, 20, p);
-            canvas.drawText("Min Rate: " + Long.toString(minFrameRate) + "fps", 10, 30, p);
         }
 
     }

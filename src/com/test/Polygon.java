@@ -17,7 +17,7 @@ public class Polygon{
     private final float canvasWidth, canvasHeight;
 
     // The length of an edge of the polygon (only squares right now)
-    private float length;
+    private final float length;
 
     // The position of the polygon's top left corner
     private float xPos, yPos;

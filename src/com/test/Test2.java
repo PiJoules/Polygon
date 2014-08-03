@@ -178,7 +178,8 @@ public class Test2 extends Activity implements SensorEventListener{
 
         // The squares that the player must avoid or eat. These are represented by the Polygon
         // object and stored in an ArrayList for ease of additions and deletions
-        private ArrayList<Polygon> squares;
+        //private ArrayList<Polygon> squares;
+        private ArrayList<Polygon2> polygons;
         // This is the maximum number of enemies that will be inclued on the canvas 
         private final int ENEMY_LIMIT = 10;
 
@@ -203,15 +204,18 @@ public class Test2 extends Activity implements SensorEventListener{
                             h.post(new Runnable(){
                                 public void run(){
                                     // Spawns a new enemy if there are less than 10 on canvas
-                                    if (squares.size() < ENEMY_LIMIT){
+                                    //if (squares.size() < ENEMY_LIMIT){
+                                    if (polygons.size() < ENEMY_LIMIT){
                                         Random r = new Random();
                                         // Assigns the new square a width between 50% and 150% of oval's width
                                         float nextWidth = r.nextFloat()*oval.getRadius()*2+oval.getRadius();
                                         // Picks a random corner to spawn the new square
                                         int nextCorner = r.nextInt(4);
+                                        int nextSides = r.nextInt(5)+1;
                                         // Adds the new square to the ArrayList of enemies. Assigns it a random
                                         // x and y velocity between .5 and 2.5
-                                        squares.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight));
+                                        //squares.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight));
+                                        polygons.add(new Polygon2(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight, nextSides));
                                     }
                                 }
                             });
@@ -244,16 +248,20 @@ public class Test2 extends Activity implements SensorEventListener{
                 canvas.drawOval(oval.oval, p);
                 
                 // An iterator to go through the squares to move them and check collisions
-                Iterator<Polygon> iter = squares.iterator();
+                //Iterator<Polygon> iter = squares.iterator();
+                Iterator<Polygon2> iter = polygons.iterator();
                 while(iter.hasNext()){
-                    Polygon square = iter.next();
+                    //Polygon square = iter.next();
+                    Polygon2 polygon = iter.next();
                 
                     if (!paused){
                         // Call each enemy's move method. Returns whether or not polygon should be removed
-                        boolean shouldRemove = square.move();
+                        //boolean shouldRemove = square.move();
+                        boolean shouldRemove = polygon.move();
 
                         // Check if the oval is intersecting the square. Returns the result of collission checking
-                        boolean collided = square.checkCollisions(oval.getX(), oval.getY(), oval.getRadius());
+                        //boolean collided = square.checkCollisions(oval.getX(), oval.getY(), oval.getRadius());
+                        boolean collided = polygon.checkCollisions(oval.getX(), oval.getY(), oval.getRadius());
 
                         // Polygon has stayed past collision limiy. Only remove immediately if it
                         // hasn't also collided with the oval

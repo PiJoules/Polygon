@@ -15,7 +15,6 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.InputType;
 import android.view.View;
 import android.view.Window;
@@ -168,7 +167,7 @@ public class Test2 extends Activity implements SensorEventListener{
         
         // Canvas objects and variables
         // The paint object colors the objects drawn on the screen
-        private Paint p = new Paint();
+        private final Paint p = new Paint();
         // The dimensions of the game screen
         private float canvasWidth, canvasHeight;
         // Boolean to check that the screen has been initialized
@@ -177,9 +176,9 @@ public class Test2 extends Activity implements SensorEventListener{
         // The object representing the player character, an oval
         private Player oval;
 
-        // The squares that the player must avoid or eat. These are represented by the Polygon
+        // The polygons that the player must avoid or eat. These are represented by the Polygon
         // object and stored in an ArrayList for ease of additions and deletions
-        private ArrayList<Polygon> squares;
+        private final ArrayList<Polygon> polygons;
         // This is the maximum number of enemies that will be inclued on the canvas 
         private final int ENEMY_LIMIT = 10;
 
@@ -202,8 +201,8 @@ public class Test2 extends Activity implements SensorEventListener{
             // Set background color
             this.setBackgroundColor(Color.WHITE);
 
-            // Initialize squares list
-            squares = new ArrayList<Polygon>();
+            // Initialize polygons list
+            polygons = new ArrayList<Polygon>();
         }
         
         // This is the method that is repeatedly called to redraw the game screen. It controls the
@@ -219,49 +218,50 @@ public class Test2 extends Activity implements SensorEventListener{
                     // Handled in player class
                     oval.move(accelSensor.getAccelFiltered());
 
-                    if(squares.size() < ENEMY_LIMIT && System.currentTimeMillis() > nextAddition){
+                    if(polygons.size() < ENEMY_LIMIT && System.currentTimeMillis() > nextAddition){
                         nextAddition = System.currentTimeMillis() + 1000;
                         Random r = new Random();
-                        // Assigns the new square a width between 50% and 150% of oval's width
+                        // Assigns the new polygon a width between 50% and 150% of oval's width
                         float nextWidth = r.nextFloat()*oval.getRadius()*2+oval.getRadius();
-                        // Picks a random corner to spawn the new square
+                        // Picks a random corner to spawn the new polygon
                         int nextCorner = r.nextInt(4);
-                        // Adds the new square to the ArrayList of enemies. Assigns it a random
+                        // Adds the new polygon to the ArrayList of enemies. Assigns it a random
                         // x and y velocity between .5 and 2.5
-                        squares.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight));
+                        polygons.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight,r.nextInt(5)+3));
                     }
                 }
                 
                 p.setColor(Color.BLACK);
                 canvas.drawOval(oval.oval, p);
                 
-                // An iterator to go through the squares to move them and check collisions
-                Iterator<Polygon> iter = squares.iterator();
+                // An iterator to go through the polygons to move them and check collisions
+                Iterator<Polygon> iter = polygons.iterator();
                 int i = 0;
                 while(iter.hasNext()){
-                    Polygon square = iter.next();
-                    canvas.drawText(Float.toString(square.getX()) + " " + Float.toString(square.getY()),10,10*i+20,p);
+                    Polygon polygon = iter.next();
+                    //canvas.drawText(Float.toString(polygon.getX()) + " " + Float.toString(polygon.getY()),10,10*i+20,p);
+                    //System.out.println("i:" + i + " x:" + polygon.getX() + " y:" + polygon.getY());
                     i++;
                 
                     if (!paused){
                         // Call each enemy's move method. Returns whether or not polygon should be removed
-                        boolean shouldRemove = square.move();
+                        boolean shouldRemove = polygon.move();
 
-                        // Check if the oval is intersecting the square. Returns the result of collission checking
-                        boolean collided = square.checkCollisions(oval.getX(), oval.getY(), oval.getRadius());
+                        // Check if the oval is intersecting the polygon. Returns the result of collission checking
+                        boolean collided = polygon.checkCollisions(oval.getX(), oval.getY(), oval.getRadius());
 
                         // Polygon has stayed past collision limiy. Only remove immediately if it
                         // hasn't also collided with the oval
                         if(shouldRemove && !collided){
                             // Polygon has stayed past collision limit, should be removed
                             iter.remove();
-                            continue; // Continue to next square as this one will not be redrawn
+                            continue; // Continue to next polygon as this one will not be redrawn
                         }
 
                         if(collided){
-                            // Pass polygon to oval's eat method. If square is larger, the game ends. Other wise,
+                            // Pass polygon to oval's eat method. If polygon is larger, the game ends. Other wise,
                             // a fraction of its area is added to the oval's area
-                            boolean dead = oval.eat(square);
+                            boolean dead = oval.eat(polygon);
                             
                             // Calculate new diameter of the oval. This will be the final score if player dies
                             size = 2*round(oval.getRadius(),2);
@@ -272,9 +272,9 @@ public class Test2 extends Activity implements SensorEventListener{
                                 return; // Break out of drawing loop
                             }
 
-                            // Dead was false, so square was eaten. Remove it from list
+                            // Dead was false, so polygon was eaten. Remove it from list
                             iter.remove();
-                            continue; // Continue to next square as this one will not be redrawn
+                            continue; // Continue to next polygon as this one will not be redrawn
                         }
 
                     }
@@ -282,7 +282,8 @@ public class Test2 extends Activity implements SensorEventListener{
                     // Set color of polygon to green
                     p.setColor(Color.GREEN);
                     // Draw the polygon
-                    canvas.drawRect(square.shape, p);
+                    //canvas.drawRect(polygon.shape, p);
+                    canvas.drawPath(polygon, polygon.p);
                     
                 }
                 

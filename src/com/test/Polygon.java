@@ -2,6 +2,7 @@ package com.test;
 
 
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 
@@ -33,6 +34,8 @@ public class Polygon extends Path{
     
     // number of sides of polygon
     private final int sides;
+    
+    private int angle = 0;
     
     // paint of the polygon
     public final Paint p = new Paint();
@@ -89,18 +92,26 @@ public class Polygon extends Path{
 
         // Creates the new polygon in its corner
         //shape = new RectF(xPos-len/2.0f, yPos-len/2.0f, xPos+len/2.0f, yPos+len/2.0f);
-        createShape(sides);
+        setPath(sides,0);
+        setColor(sides);
     }
     
-    // method for making the polygon object
-    private void createShape(int n){
-        moveTo(xPos+length, yPos); // start drawing at top left corner
+    private void setPath(int n, int angle){
+        rewind(); // clear all points from the path
+        moveTo(
+                (float) (xPos+length*Math.cos(angle*Math.PI/180)),
+                (float) (yPos+length*Math.sin(angle*Math.PI/180)));
         for (int i = 1; i < n; i++){
-            float nextX = (float) (xPos+length*Math.cos(2*Math.PI*i/n));
-            float nextY = (float) (yPos+length*Math.sin(2*Math.PI*i/n));
+            float nextX = (float) (xPos+length*Math.cos(2*Math.PI*i/n + angle*Math.PI/180));
+            float nextY = (float) (yPos+length*Math.sin(2*Math.PI*i/n + angle*Math.PI/180));
             lineTo(nextX, nextY);
         }
-        lineTo(xPos+length, yPos);
+        lineTo(
+                (float) (xPos+length*Math.cos(angle*Math.PI/180)),
+                (float) (yPos+length*Math.sin(angle*Math.PI/180)));
+    }
+    
+    private void setColor(int n){
         if (n == 3) p.setColor(Color.RED);
         else if (n == 4) p.setARGB(255, 255, 165, 0);
         else if (n == 5) p.setColor(Color.GREEN);
@@ -110,6 +121,9 @@ public class Polygon extends Path{
     
     // update the position and boundaries of the polygon after moving
     private void translate(float dx, float dy){
+        angle %= 360;
+        setPath(sides,angle++);
+        setColor(sides);
         offset(dx,dy);
         xPos += dx;
         yPos += dy;

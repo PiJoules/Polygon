@@ -203,6 +203,9 @@ public class Test2 extends Activity implements SensorEventListener{
 
             // Initialize polygons list
             polygons = new ArrayList<Polygon>();
+            
+            // set color of the oval
+            p.setColor(Color.BLACK);
         }
         
         // This is the method that is repeatedly called to redraw the game screen. It controls the
@@ -214,6 +217,7 @@ public class Test2 extends Activity implements SensorEventListener{
             if (initialized){
                 
                 if (!paused){
+                    
                     // Calculate new speed and position of player and move player
                     // Handled in player class
                     oval.move(accelSensor.getAccelFiltered());
@@ -231,7 +235,6 @@ public class Test2 extends Activity implements SensorEventListener{
                     }
                 }
                 
-                p.setColor(Color.BLACK);
                 canvas.drawOval(oval.oval, p);
                 
                 // An iterator to go through the polygons to move them and check collisions
@@ -240,7 +243,6 @@ public class Test2 extends Activity implements SensorEventListener{
                 while(iter.hasNext()){
                     Polygon polygon = iter.next();
                     //canvas.drawText(Float.toString(polygon.getX()) + " " + Float.toString(polygon.getY()),10,10*i+20,p);
-                    //System.out.println("i:" + i + " x:" + polygon.getX() + " y:" + polygon.getY());
                     i++;
                 
                     if (!paused){
@@ -279,10 +281,7 @@ public class Test2 extends Activity implements SensorEventListener{
 
                     }
 
-                    // Set color of polygon to green
-                    p.setColor(Color.GREEN);
                     // Draw the polygon
-                    //canvas.drawRect(polygon.shape, p);
                     canvas.drawPath(polygon, polygon.p);
                     
                 }

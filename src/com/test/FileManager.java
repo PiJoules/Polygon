@@ -19,6 +19,11 @@ public class FileManager {
     private String contents = "";
     public final String DELIMETER = "#", DELIMETER2 = "##";
     
+    // default constructor
+    public FileManager(Context context){
+        this.context = context;
+    }
+    
     // Constructor
     public FileManager(Context context, String fileName){
         // Name of file to save to

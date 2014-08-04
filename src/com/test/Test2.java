@@ -84,6 +84,8 @@ public class Test2 extends Activity implements SensorEventListener{
         
         // Creates the accelerometer object. Passes this Activity to the constructor
         accelSensor = new Accelerometer(this,this);
+        
+        HTTPManager httpm = new HTTPManager(this);
     }
     
     
@@ -99,7 +101,7 @@ public class Test2 extends Activity implements SensorEventListener{
         // Set placeholder text that will disappear once the user enters something into the textbox
         input.setHint("Enter name here to save score");
         // Create a score manager object that will update the scores stored on the phone
-        final ScoreManager sm = new ScoreManager(this,null);
+        final ScoreManager sm = new ScoreManager(this);
         
         // Create the alert message GUI that the user interacts with
         new AlertDialog.Builder(this)
@@ -111,7 +113,8 @@ public class Test2 extends Activity implements SensorEventListener{
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
                     public void onClick(DialogInterface dialog, int which){
                         // Get the text the user entered
-                        String name = input.getText().toString();
+                        String name = input.getText().toString().replace('#', '*');
+                        if (name.length() > 255) name = name.substring(0, 255);
                         // If the user did not enter a name, save them as "Anonymous"
                         if(name == null || name.equals("")){
                             name = "Anonymous";
@@ -121,7 +124,13 @@ public class Test2 extends Activity implements SensorEventListener{
                         // Exit alert message
                         finish();
                     }
-                }).show();
+                })
+                .setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        finish();
+                    }
+                })
+                .show();
     }
     
     // The method to be called when the user-reopens the app. Overrides the onResume method in

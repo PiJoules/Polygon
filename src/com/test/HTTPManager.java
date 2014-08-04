@@ -6,6 +6,10 @@
 
 package com.test;
 
+import android.app.Activity;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,31 +29,62 @@ import org.apache.http.util.EntityUtils;
  * @author Pi_Joules
  */
 public class HTTPManager {
-    public HTTPManager(){
+    
+    private final Activity a;
+    private final String url = "http://www.kompactit.com/polygon/postscores.php"; // just using space on my current website
+    private final String ERR = "err";
+    private String httpResponse = "";
+    
+    public HTTPManager(Activity a){
+        this.a = a;
+    }
+    
+    public boolean post(String scoreString, String delimeter, String delimeter2){
+        if (!isOnline(a)){
+            httpResponse = "not connected to internet";
+            return false;
+        }
         try{
             HttpClient httpclient = new DefaultHttpClient();
             
-            HttpPost httppost = new HttpPost("http://www.kompactit.com/polygon/scores.php");
+            HttpPost httppost = new HttpPost(url);
             
             // Add your data
             List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(2);
-            nameValuePairs.add(new BasicNameValuePair("first", " 'n'"));
-            nameValuePairs.add(new BasicNameValuePair("last", " butts"));
+            nameValuePairs.add(new BasicNameValuePair("scoreString", scoreString));
+            nameValuePairs.add(new BasicNameValuePair("delimeter", delimeter));
+            nameValuePairs.add(new BasicNameValuePair("delimeter2", delimeter2));
+            nameValuePairs.add(new BasicNameValuePair("errorflag", ERR));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             // Execute HTTP Post Request
             HttpResponse response = httpclient.execute(httppost);
             
-            //HttpResponse response = httpclient.execute(new HttpGet("http://www.kompactit.com/polygon/scores.php?first='y'&last=' butts'"));
             StatusLine statusLine = response.getStatusLine();
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){
                 String responseBody = EntityUtils.toString(response.getEntity());
-                System.out.println(responseBody);
+                httpResponse = responseBody;
+                return !httpResponse.substring(httpResponse.length()-3, httpResponse.length()).equals(ERR);
             } else{
                 //Closes the connection.
                 response.getEntity().getContent().close();
-                throw new IOException(statusLine.getReasonPhrase());
+                httpResponse = statusLine.getReasonPhrase();
+                return false;
             }
-        }catch(IOException e){}
+        }
+        catch(IOException e){
+            httpResponse = e.getMessage();
+            return false;
+        }
+    }
+    
+    public String getHttpResponse(){
+        return httpResponse;
+    }
+    
+    private boolean isOnline(Activity a) {
+        ConnectivityManager cm = (ConnectivityManager) a.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnected();
     }
 }

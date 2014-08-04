@@ -11,18 +11,16 @@ import java.util.Arrays;
 public class ScoreManager extends FileManager {
     // File to save scores to    
     private final String SCORESFILE = "scores.txt";
-
-    // Delimiters to use to format saved scores
-    private final String DELIMETER = "#";
-    private final String DELIMETER2 = "##";
     
     // The array of high scores and name of player that got each score
     private String[][] scores;
+    
+    private String scoreString;
 
     // Constructor
-    public ScoreManager(Context context, String fileName) {
+    public ScoreManager(Context context) {
         // Call FileManager constructor
-        super(context, fileName);
+        super(context);
         
         // Set file to save to
         this.setFile(SCORESFILE);
@@ -31,6 +29,16 @@ public class ScoreManager extends FileManager {
         this.scores = parseScores();
     }
     
+    public ScoreManager(Context context, String fileName){
+        super(context, fileName);
+        this.scores = parseScores();
+    }
+    
+    // method for changing the parseScores if reading new file
+    public void resetParsedScores(){
+        this.scores = parseScores();
+    } 
+    
     // Read files from file and return them in a structured list
     private String[][] parseScores(){
         String[][] s = new String[5][2];
@@ -38,6 +46,8 @@ public class ScoreManager extends FileManager {
 
         // Try to read the high scores file
         if (readSavedData()){
+            scoreString = this.getContents();
+            
             // Remove delimeters
             data = this.getContents().split(DELIMETER2);
             // Go through each formatted score from the file
@@ -99,6 +109,11 @@ public class ScoreManager extends FileManager {
 
         // Call the writeData method to write the text to a file
         writeData(nextScores);
+        scoreString = this.getContents();
+    }
+    
+    public String getScoreString(){
+        return this.scoreString;
     }
     
     // Delete all saved scores and replace them with dummy scores

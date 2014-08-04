@@ -18,9 +18,9 @@ public class MainMenu extends Activity {
     // Buttons
     private Button play, settings;
     // Table that shows the high scores and names
-    private TableLayout table;
+    private TableLayout table, table2;
     // The text fields containing the high scores and names
-    private TextView[][] tvs;
+    private TextView[][] tvs, table2tvs;
     
     // Method called when the main menu screen is created. Overrides onCreate method of Activity
     @Override
@@ -64,7 +64,7 @@ public class MainMenu extends Activity {
     @Override
     protected void onResume(){
         super.onResume();
-        final ScoreManager sm = new ScoreManager(this, null);
+        ScoreManager sm = new ScoreManager(this);
         String[][] scores = sm.getParsedScores();
         
         // Create table if it doesn't already exist
@@ -80,6 +80,31 @@ public class MainMenu extends Activity {
         for (int i = 0; i < scores.length; i++){
             tvs[i][0].setText(scores[i][0]);
             tvs[i][1].setText(scores[i][1]);
+        }
+        
+        int table2rows = 5;
+        int table2cols = 2;
+        if (table2 == null){
+            table2 = (TableLayout) findViewById(R.id.table2);
+            table2tvs = new TextView[table2rows][table2cols];
+            for (int i = 0; i < table2rows; i++){
+                table2tvs[i][0] = (TextView) findViewById(R.id.table2name0 + 2*i);
+                table2tvs[i][1] = (TextView) findViewById(R.id.table2name0 + 2*i+1);
+            }
+        }
+        
+        HTTPManager httpm = new HTTPManager(this);
+        if (httpm.post(sm.getScoreString(), sm.DELIMETER, sm.DELIMETER2)){
+            ScoreManager smGlobal = new ScoreManager(this,"global_scores.txt");
+            smGlobal.writeData(httpm.getHttpResponse());
+            if (smGlobal.readSavedData()){
+                smGlobal.resetParsedScores();
+                String[][] globalScores = smGlobal.getParsedScores();
+                for (int i = 0; i < globalScores.length; i++){
+                    table2tvs[i][0].setText(globalScores[i][0]);
+                    table2tvs[i][1].setText(globalScores[i][1]);
+                }
+            }
         }
     }
     

@@ -24,7 +24,7 @@ public class MainMenu extends Activity {
     
     // Method called when the main menu screen is created. Overrides onCreate method of Activity
     @Override
-    public void onCreate(Bundle icicle) {
+    public void onCreate(Bundle icicle){
         super.onCreate(icicle);
         
         //Remove title bar and notification bar

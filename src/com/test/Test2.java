@@ -14,6 +14,7 @@ import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -203,6 +204,7 @@ public class Test2 extends Activity implements SensorEventListener{
         private long nextReDrawTime = currentTime + FRAME_PERIOD;
         private long nextAddition = System.currentTimeMillis() + 1000;
         private final float defaultTextSize;
+        private final MediaPlayer mp = MediaPlayer.create(getApplicationContext(), R.raw.blop);
 
         // The object constructors
         public CustomDrawableView(Context context) {
@@ -217,6 +219,8 @@ public class Test2 extends Activity implements SensorEventListener{
             // set color of the oval
             p.setColor(Color.BLACK);
             defaultTextSize = p.getTextSize();
+            
+            mp.setVolume(1f, 1f);
         }
         
         // This is the method that is repeatedly called to redraw the game screen. It controls the
@@ -272,6 +276,9 @@ public class Test2 extends Activity implements SensorEventListener{
                         }
 
                         if(collided){
+                            
+                            mp.start();
+                            
                             // Pass polygon to oval's eat method. If polygon is larger, the game ends. Other wise,
                             // a fraction of its area is added to the oval's area
                             boolean dead = oval.eat(polygon);

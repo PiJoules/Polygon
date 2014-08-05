@@ -2,9 +2,10 @@ package com.test;
 
 
 import android.graphics.Color;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.media.MediaPlayer;
+import android.net.Uri;
 
 
 // An object representing the shapes that the oval must dodge

@@ -124,8 +124,8 @@ public class Accelerometer{
         // Else, readings should only be added, so removing step is skipped
 
         // Save raw unfiltered data
-        xAccelUnfiltered = -event.values[0]; // xAccel negated because tilting right is negative
-        yAccelUnfiltered = event.values[1];
+        yAccelUnfiltered = -event.values[0]; // yAccel negated because tilting right is negative
+        xAccelUnfiltered = -event.values[1];
         zAccelUnfiltered = event.values[2];
 
         // Add unfiltered data to history

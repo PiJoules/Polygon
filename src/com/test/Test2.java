@@ -68,7 +68,7 @@ public class Test2 extends Activity implements SensorEventListener{
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         
         // lock the view to a vertical portrait orientation
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
                     
         // setup the custom canvas
         mCustomDrawableView = new CustomDrawableView(this); // set the custom view that contains the game
@@ -202,6 +202,7 @@ public class Test2 extends Activity implements SensorEventListener{
         private long currentTime = System.currentTimeMillis();
         private long nextReDrawTime = currentTime + FRAME_PERIOD;
         private long nextAddition = System.currentTimeMillis() + 1000;
+        private final float defaultTextSize;
 
         // The object constructors
         public CustomDrawableView(Context context) {
@@ -215,6 +216,7 @@ public class Test2 extends Activity implements SensorEventListener{
             
             // set color of the oval
             p.setColor(Color.BLACK);
+            defaultTextSize = p.getTextSize();
         }
         
         // This is the method that is repeatedly called to redraw the game screen. It controls the
@@ -289,6 +291,13 @@ public class Test2 extends Activity implements SensorEventListener{
                         }
 
                     }
+                    else {
+                        p.setTextSize(30f);
+                        p.setTextAlign(Paint.Align.CENTER);
+                        float x = (int) canvasWidth/2;
+                        float y = (int) ((canvasHeight/2) - ((p.descent() + p.ascent())/2));
+                        canvas.drawText("PAUSED", x, y, p);
+                    }
 
                     // Draw the polygon
                     canvas.drawPath(polygon, polygon.p);
@@ -323,6 +332,8 @@ public class Test2 extends Activity implements SensorEventListener{
                 return;
             }
 
+            p.setTextSize(defaultTextSize);
+            p.setTextAlign(Paint.Align.LEFT);
             canvas.drawText(Float.toString(((float) misses)/((float) total)), 10, 10, p);
             // Calculate end of next redraw period
             nextReDrawTime = currentTime + FRAME_PERIOD;

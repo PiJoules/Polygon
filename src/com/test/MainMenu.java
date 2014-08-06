@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TableLayout;
 import android.widget.TextView;
+import android.util.Log;
 
 // Activity for the main menu screen
 public class MainMenu extends Activity {
@@ -104,6 +105,7 @@ public class MainMenu extends Activity {
                 for (int i = 0; i < globalScores.length; i++){
                     table2tvs[i][0].setText(globalScores[i][0]);
                     table2tvs[i][1].setText(globalScores[i][1]);
+                    Log.d("TestApp","HEIEHfhiasjcOI:SOIHFOWD:O");
                 }
             }
         }

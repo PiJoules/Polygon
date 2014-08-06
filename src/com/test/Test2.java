@@ -17,10 +17,13 @@ import android.hardware.SensorEventListener;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.InputType;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.PopupMenu;
+import android.widget.RelativeLayout;
 
 // Java imports
 import java.math.BigDecimal;
@@ -79,6 +82,33 @@ public class Test2 extends Activity implements SensorEventListener{
         mCustomDrawableView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 paused = !paused;
+                // If user is pausing game, display pause menu using Alert Dialog gui
+                if(paused){
+                    new AlertDialog.Builder(getContext())
+                        // Set title
+                        .setTitle("Paused")
+                        // Create a calibration button to set current position as zero position
+                        .setPositiveButton("Calibrate", new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dialog, int id) {
+                                accelSensor.calibrate();
+                                paused = false;
+                            }
+                        })
+                        // Create a button to reset to default calibration
+                        .setNeutralButton("Reset Calibation", new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dialog, int which) {
+                                accelSensor.zero();
+                                paused = false;
+                            }
+                        })
+                        // Create exit button
+                        .setNegativeButton("Resume", new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dialog, int which) {
+                                paused = false;
+                            }
+                        })
+                        .show();
+                }
             }
         });
         setContentView(mCustomDrawableView); // finally set the view of the game as the custom view
@@ -171,6 +201,10 @@ public class Test2 extends Activity implements SensorEventListener{
         
     }
 
+    public Context getContext(){
+        return this;
+    }
+
 
     // The game view object
     private class CustomDrawableView extends View {
@@ -220,7 +254,8 @@ public class Test2 extends Activity implements SensorEventListener{
             p.setColor(Color.BLACK);
             defaultTextSize = p.getTextSize();
             
-            mp.setVolume(1f, 1f);
+            //mp.setVolume(1f, 1f);
+            mp.setVolume(0f, 0f);
         }
         
         // This is the method that is repeatedly called to redraw the game screen. It controls the
@@ -254,11 +289,8 @@ public class Test2 extends Activity implements SensorEventListener{
                 
                 // An iterator to go through the polygons to move them and check collisions
                 Iterator<Polygon> iter = polygons.iterator();
-                int i = 0;
                 while(iter.hasNext()){
                     Polygon polygon = iter.next();
-                    //canvas.drawText(Float.toString(polygon.getX()) + " " + Float.toString(polygon.getY()),10,10*i+20,p);
-                    i++;
                 
                     if (!paused){
                         // Call each enemy's move method. Returns whether or not polygon should be removed
@@ -298,13 +330,6 @@ public class Test2 extends Activity implements SensorEventListener{
                         }
 
                     }
-                    else {
-                        p.setTextSize(30f);
-                        p.setTextAlign(Paint.Align.CENTER);
-                        float x = (int) canvasWidth/2;
-                        float y = (int) ((canvasHeight/2) - ((p.descent() + p.ascent())/2));
-                        canvas.drawText("PAUSED", x, y, p);
-                    }
 
                     // Draw the polygon
                     canvas.drawPath(polygon, polygon.p);
@@ -321,8 +346,8 @@ public class Test2 extends Activity implements SensorEventListener{
                 
                 // Setup controlled oval
                 // Place an oval of radius 5 at center of screen
-                size = 5.0f;
-                oval = new Player(canvasWidth/2, canvasHeight/2, size, canvasWidth, canvasHeight);
+                size = 10.0f;
+                oval = new Player(canvasWidth/2, canvasHeight/2, size/2, canvasWidth, canvasHeight);
             }
     
 
@@ -350,5 +375,5 @@ public class Test2 extends Activity implements SensorEventListener{
         }
 
     }
-    
+
 }

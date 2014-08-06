@@ -72,7 +72,7 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         // set the view the layout of the time_series_example.xml file
         setContentView(R.layout.time_series_example);
         
-        // initialize the acceleromater
+        // initialize the accelerometer
         accel = new Accelerometer(this,this);
         
         // initiliaze the accelerometer file manager
@@ -165,20 +165,21 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         plot.setDomainLabel("Data Point Number"); // set the x axis label
         
         // check what type of filter should be used
-        if (afm.getFilterType() == 0){ // plot the raw data from the accelerometer if no filter
+        if (afm.getFilterType() == AccelerometerFileManager.NONE){
+            // Plot the raw data from the accelerometer if no filter
             plot.setTitle("Raw Accelerometer Data");
-            accel.setShouldFilter(false);
+            accel.setFilter(AccelerometerFileManager.NONE);
         }
-        else if (afm.getFilterType() == 1){ // plot the filtered data form the accelerometer using the alpha filter
+        else if (afm.getFilterType() == AccelerometerFileManager.EMA){
+            // Plot the filtered data form the accelerometer using the alpha filter
             plot.setTitle("Alpha Filter Ouput with Alpha Value (" + afm.getAccelData()[1] + ")");
-            accel.setShouldFilter(true);
-            accel.setFilter(true);
+            accel.setFilter(AccelerometerFileManager.EMA);
             accel.setAlpha(afm.getAccelData()[1]);
         }
-        else if (afm.getFilterType() == 2){ // plot the fltered data from the accelerometer using the sma filter
+        else if (afm.getFilterType() == AccelerometerFileManager.SMA){
+            // Plot the fltered data from the accelerometer using the sma filter
             plot.setTitle("SMA Filter Ouput with Period Count of (" + afm.getAccelData()[2] + ")");
-            accel.setShouldFilter(true);
-            accel.setFilter(false);
+            accel.setFilter(AccelerometerFileManager.SMA);
             accel.setPeriods((int) afm.getAccelData()[2]);
         }
         

@@ -72,7 +72,7 @@ public class FilterControl extends Activity implements SensorEventListener {
                 // Display information about EMA
                 showAlphaInfo();
                 // Edit the accleration file settings
-                afm.changeAccelFileContents(1, afm.getAccelData()[1], (int)afm.getAccelData()[2], afm.getAccelData()[3]);
+                afm.setFilter(AccelerometerFileManager.EMA);
             }
         });
         
@@ -84,7 +84,7 @@ public class FilterControl extends Activity implements SensorEventListener {
                 // Display information about SMA
                 showSMAInfo();
                 // Edit the acceleration file settings
-                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)afm.getAccelData()[2], afm.getAccelData()[3]);
+                afm.setFilter(AccelerometerFileManager.SMA);
             }
         });
         
@@ -96,7 +96,7 @@ public class FilterControl extends Activity implements SensorEventListener {
                 // Display information about no filtering
                 showNoneInfo();
                 // Edit the accleration file settings
-                afm.changeAccelFileContents(0, afm.getAccelData()[1], (int)afm.getAccelData()[2], afm.getAccelData()[3]);
+                afm.setFilter(AccelerometerFileManager.NONE);
             }
         });
         
@@ -198,46 +198,44 @@ public class FilterControl extends Activity implements SensorEventListener {
         float tval = Float.parseFloat(threshold_val.getText().toString());
 
         // Check the filtering type and change settings file accordingly
-        if (afm.getFilterType() == 0){
-            afm.changeAccelFileContents(0, afm.getAccelData()[1], (int) afm.getAccelData()[2], tval);
-        }
-        else if (afm.getFilterType() == 1){
+        afm.setThreshold(tval);
+        if (afm.getFilterType() == AccelerometerFileManager.EMA){
             if (val < 0.01){
                 val = 0.01f;
-                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2], tval);
+                afm.setAlpha(val);
                 filter_val.setText(val+"");
                 createAlertDialog("Alpha was set to 0.01 since alpha cannot be less than 0.01.");
                 return false;
             }
             else if (val > 1){
                 val = 1f;
-                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2], tval);
+                afm.setAlpha(val);
                 filter_val.setText(val+"");
                 createAlertDialog("Alpha was set to 1 since alpha cannot be greater than 1.");
                 return false;
             }
             else {
-                afm.changeAccelFileContents(1, val, (int) afm.getAccelData()[2], tval);
+                afm.setAlpha(val);
                 return true;
             }
         }
-        else if (afm.getFilterType() == 2){
+        else if (afm.getFilterType() == AccelerometerFileManager.SMA){
             if (val < 1){
                 val = 1;
-                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val, tval);
+                afm.setPeriods((int)val);
                 filter_val.setText(val+"");
                 createAlertDialog("N was set to 1 since N cannot be less than 1.");
                 return false;
             }
             else if (val%1 != 0){
                 val = Math.round(val);
-                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val, tval);
+                afm.setPeriods((int)val);
                 filter_val.setText(val+"");
                 createAlertDialog("N was rounded since N must be an integer.");
                 return false;
             }
             else {
-                afm.changeAccelFileContents(2, afm.getAccelData()[1], (int)val, tval);
+                afm.setPeriods((int) val);
                 return true;
             }
         }

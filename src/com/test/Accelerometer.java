@@ -16,7 +16,8 @@ import java.util.ArrayList;
 
 public class Accelerometer{
     // Accelerometer readings    
-    private float xAccelFiltered, yAccelFiltered, zAccelFiltered, // Filtered readings
+    private float xAccelRaw, yAccelRaw, zAccelRaw, // Raw uncalibrated, unnormalized readings
+                  xAccelFiltered, yAccelFiltered, zAccelFiltered, // Filtered readings
                   xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered; // Unfiltered readings
     
     // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
@@ -27,11 +28,11 @@ public class Accelerometer{
     // The SensorEventListener 'sel' is required to enable and register sensors in the phone
     private SensorEventListener sel;
 
-    // Filtering settings
-    // Static constants representing the filtering method. Used so other objects can easily switch
-    // between filter modes using these constants
-    public static final boolean EMA = true; // alpha
-    public static final boolean SMA = false; // sma
+    // File manager for handling the text file that stores accelerometer and filtering settings
+    private AccelerometerFileManager afm;
+
+    // Acceleration offsets to use in calibrating the accelerometer for a different zero position
+    private float ax_off, ay_off, az_off;
     
     // Exponential moving average constant
     private float alpha;
@@ -43,11 +44,8 @@ public class Accelerometer{
     // containing x acceleration, y acceleration, and z acceleration in that order
     private ArrayList<float[]> pastData;
     
-    // boolean indicating whether or not filter should be used
-    private boolean shouldFilter;
-    
-    // boolean indicating which filter to use
-    private boolean filterMode;
+    // Integer indicating which filter (or no filter) to use
+    private int filterMode;
     
 
     /**
@@ -72,7 +70,23 @@ public class Accelerometer{
         this.sel = sel;
 
 
+        // Initiliaze the accelerometer file manager
+        afm = new AccelerometerFileManager(a.getApplicationContext(), "");
+        // Get settings from accelerometer settings file
+        float[] settings = afm.getAccelData();
+
+        // Initialize filtering settings from file contents
+        filterMode = (int) settings[AccelerometerFileManager.TYPE];
+        alpha = settings[AccelerometerFileManager.ALPHA];
+        periods = (int) settings[AccelerometerFileManager.PERIODS];
+        ax_off = settings[AccelerometerFileManager.X_OFFSET];
+        ay_off = settings[AccelerometerFileManager.Y_OFFSET];
+        az_off = settings[AccelerometerFileManager.Z_OFFSET];
+
         // Initialize accelerometer values
+        xAccelRaw = 0.0f;
+        yAccelRaw = 0.0f;
+        zAccelRaw = 0.0f;
         xAccelFiltered = 0.0f;
         yAccelFiltered = 0.0f;
         zAccelFiltered = 0.0f;
@@ -80,12 +94,8 @@ public class Accelerometer{
         yAccelUnfiltered = 0.0f;
         zAccelUnfiltered = 0.0f;
 
-        // Initialize filtering settings to default values
-        alpha = 0.95f; // Large alpha for limited lag
-        periods = 5;   // Small to limit lag
-        pastData = new ArrayList<float[]>(); // Contains last [periods] readings
-        shouldFilter = true; // Filtering on by default
-        filterMode = EMA; // Default to EMA filter
+        // Initialize array list of past readings
+        pastData = new ArrayList<float[]>();
     }
 
 
@@ -123,18 +133,22 @@ public class Accelerometer{
         }
         // Else, readings should only be added, so removing step is skipped
 
-        // Save raw unfiltered data
-        yAccelUnfiltered = -event.values[0]; // yAccel negated because tilting right is negative
-        xAccelUnfiltered = -event.values[1];
-        zAccelUnfiltered = event.values[2];
+        // Save raw and unfiltered data
+        // Y and X flipped and negated for landscape orientation. 
+        xAccelRaw = -event.values[0];
+        yAccelRaw = -event.values[1];
+        zAccelRaw = event.values[2];
+        yAccelUnfiltered = xAccelRaw - ax_off;
+        xAccelUnfiltered = yAccelRaw - ay_off;
+        zAccelUnfiltered = zAccelRaw - az_off;
 
         // Add unfiltered data to history
         pastData.add(new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered});
 
         // Check if filtering is turned on
-        if(shouldFilter){
+        if(filterMode == AccelerometerFileManager.NONE){
             // Filtering is on, check which type to use
-            if(filterMode == EMA){
+            if(filterMode == AccelerometerFileManager.EMA){
                 // Apply exponential moving average filter
                 xAccelFiltered = alpha*xAccelUnfiltered + (1.0f-alpha)*xAccelFiltered;
                 yAccelFiltered = alpha*yAccelUnfiltered + (1.0f-alpha)*yAccelFiltered;
@@ -143,9 +157,9 @@ public class Accelerometer{
             else{
                 // Apply simple moving average filter
                 // Summing variables
-                float xSum = 0;
-                float ySum = 0;
-                float zSum = 0;
+                float xSum = 0f;
+                float ySum = 0f;
+                float zSum = 0f;
 
                 // Sum past data
                 for(float[] data : pastData){
@@ -184,6 +198,10 @@ public class Accelerometer{
 
 
     // Getter methods for acceleration data. Returns an array
+    public float[] getAccelRaw(){
+        return new float[]{xAccelRaw, yAccelRaw, zAccelRaw};
+    }
+
     public float[] getAccelFiltered(){
         return new float[]{xAccelFiltered, yAccelFiltered, zAccelFiltered};
     }
@@ -195,20 +213,38 @@ public class Accelerometer{
     // Getter method for acceleration method that does not specify which data it wants
     public float[] getAccel(){
         // Filtering is on, return filtered data
-        if(shouldFilter){
+        if(filterMode != AccelerometerFileManager.NONE){
             return new float[]{xAccelFiltered, yAccelFiltered, zAccelFiltered};
         }
         // Filtering is off, return unfiltered data
         return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
     }
 
+    // Set the current accelerometer readings as the zero position where the circle will not move
+    public void calibrate(){
+        // Record current acceleration values to use as offsets
+        ax_off = xAccelRaw;
+        ay_off = yAccelRaw;
+        az_off = zAccelRaw - 9.81f;
+        afm.setOffset(new float[]{ax_off, ay_off, az_off});
+    }
+
+    // Set the zero position back to the default position
+    public void zero(){
+        ax_off = 0f;
+        ay_off = 0f;
+        az_off = 0f;
+        afm.setOffset(new float[]{0f,0f,0f});
+    }
+
+
     // Getter and setter methods for filter mode
-    public boolean getFilter(){
+    public int getFilter(){
         return filterMode;
     }
 
     // Filter is defined by class constants EMA and SMA
-    public void setFilter(boolean filter){
+    public void setFilter(int filter){
         filterMode = filter;
     }
     
@@ -230,13 +266,4 @@ public class Accelerometer{
         periods = newNum;
     }
 
-
-    // Getter and setter methods for whether or not filtering is on
-    public void setShouldFilter(boolean set){
-        this.shouldFilter = set;
-    }
-    
-    public boolean getShouldFilter(){
-        return this.shouldFilter;
-    }
 }

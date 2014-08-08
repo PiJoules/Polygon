@@ -17,13 +17,10 @@ import android.hardware.SensorEventListener;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.text.InputType;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.EditText;
-import android.widget.PopupMenu;
-import android.widget.RelativeLayout;
 
 // Java imports
 import java.math.BigDecimal;
@@ -52,7 +49,6 @@ public class Test2 extends Activity implements SensorEventListener{
 
     // The accelerometer object. This is used to get new accelerometer readings
     private Accelerometer accelSensor;
-
 
     // The onCreate method is what's called evertime the game launches
     // The onCreate method is a method inherited from the parent class Activity
@@ -115,8 +111,6 @@ public class Test2 extends Activity implements SensorEventListener{
         
         // Creates the accelerometer object. Passes this Activity to the constructor
         accelSensor = new Accelerometer(this,this);
-        
-        HTTPManager httpm = new HTTPManager(this);
     }
     
     
@@ -225,6 +219,10 @@ public class Test2 extends Activity implements SensorEventListener{
         private final ArrayList<Polygon> polygons;
         // This is the maximum number of enemies that will be inclued on the canvas 
         private final int ENEMY_LIMIT = 10;
+        
+        /*
+        INSTRUCTIONS WILL CONTROL THE ENEMY LIMIT ABOVE
+        */
 
         // To keep the time between each movement constant, we use a frame rate so that the screen
         // will only redraw itself at set intervals and sleep if it completes drawing before the 
@@ -272,19 +270,28 @@ public class Test2 extends Activity implements SensorEventListener{
                     // Handled in player class
                     oval.move(accelSensor.getAccelFiltered());
 
+                    /*
+                    INSTRUCTIONS WILL CONTROL THIS PART FOR ADDING NEXT POLYGON
+                    */
+                    
+                    // add another polygon
                     if(polygons.size() < ENEMY_LIMIT && System.currentTimeMillis() > nextAddition){
                         nextAddition = System.currentTimeMillis() + 1000;
                         Random r = new Random();
                         // Assigns the new polygon a width between 50% and 150% of oval's width
                         float nextWidth = r.nextFloat()*oval.getRadius()*2+oval.getRadius();
+                        
                         // Picks a random corner to spawn the new polygon
                         int nextCorner = r.nextInt(4);
+                        // Pick random number of sides from 3 to 7 sides
+                        int nextSides = r.nextInt(5)+3;
                         // Adds the new polygon to the ArrayList of enemies. Assigns it a random
                         // x and y velocity between .5 and 2.5
-                        polygons.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight,r.nextInt(5)+3));
+                        polygons.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight,nextSides));
                     }
                 }
                 
+                // draw the oval on the canvas
                 canvas.drawOval(oval.oval, p);
                 
                 // An iterator to go through the polygons to move them and check collisions
@@ -292,6 +299,7 @@ public class Test2 extends Activity implements SensorEventListener{
                 while(iter.hasNext()){
                     Polygon polygon = iter.next();
                 
+                    // move polygon if not paused
                     if (!paused){
                         // Call each enemy's move method. Returns whether or not polygon should be removed
                         boolean shouldRemove = polygon.move();
@@ -334,7 +342,7 @@ public class Test2 extends Activity implements SensorEventListener{
                     // Draw the polygon
                     canvas.drawPath(polygon, polygon.p);
                     
-                }
+                } // end of Polygon iteration
                 
             }
             else {
@@ -364,9 +372,14 @@ public class Test2 extends Activity implements SensorEventListener{
                 return;
             }
 
+            // draw text on canvas
             p.setTextSize(defaultTextSize);
             p.setTextAlign(Paint.Align.LEFT);
             canvas.drawText(Float.toString(((float) misses)/((float) total)), 10, 10, p);
+            p.setTextAlign(Paint.Align.RIGHT);
+            p.setTextSize(3*defaultTextSize);
+            canvas.drawText(String.format("%.2f", size), canvasWidth-10, 5+p.getTextSize(), p);
+            
             // Calculate end of next redraw period
             nextReDrawTime = currentTime + FRAME_PERIOD;
 

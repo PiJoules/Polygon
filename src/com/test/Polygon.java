@@ -4,8 +4,6 @@ package com.test;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.media.MediaPlayer;
-import android.net.Uri;
 
 
 // An object representing the shapes that the oval must dodge
@@ -23,6 +21,10 @@ public class Polygon extends Path{
 
     // The length of an edge of the polygon (only squares right now)
     private final float length;
+    
+    // The length of the polygon to be displayed on the canvas
+    // May not be the same as the actual length
+    private float displayLength;
 
     // The position of the polygon's center
     private float xPos, yPos;
@@ -50,6 +52,7 @@ public class Polygon extends Path{
 
         // Side length
         length = len;
+        displayLength = len;
 
         // Initialize collisions counter
         collisions = 0;
@@ -86,18 +89,21 @@ public class Polygon extends Path{
             yVel = -vy;
         }
         
-        left = xPos-len/2f;
+        /*left = xPos-len/2f;
         top = yPos-len/2f;
         right = xPos+len/2f;
-        bottom = yPos+len/2f;
+        bottom = yPos+len/2f;*/
+        setBounds(len/2f);
 
         // Creates the new polygon in its corner
         //shape = new RectF(xPos-len/2.0f, yPos-len/2.0f, xPos+len/2.0f, yPos+len/2.0f);
-        setPath(sides,0);
+        setPath(sides,0,length);
         setColor(sides);
     }
     
-    private void setPath(int n, int angle){
+    // depends on number of sides, the current angle,
+    // current position of the polygon, and the radius of the polygon
+    public void setPath(int n, int angle, float length){
         rewind(); // clear all points from the path
         moveTo(
                 (float) (xPos+length*Math.cos(angle*Math.PI/180)),
@@ -112,6 +118,13 @@ public class Polygon extends Path{
                 (float) (yPos+length*Math.sin(angle*Math.PI/180)));
     }
     
+    public void setBounds(float radius){
+        left = xPos-radius;
+        right = xPos+radius;
+        top = yPos-radius;
+        bottom = yPos+radius;
+    }
+    
     private void setColor(int n){
         if (n == 3) p.setColor(Color.RED);
         else if (n == 4) p.setARGB(255, 255, 165, 0);
@@ -123,7 +136,7 @@ public class Polygon extends Path{
     // update the position and boundaries of the polygon after moving
     private void translate(float dx, float dy){
         angle %= 360;
-        setPath(sides,angle++);
+        setPath(sides,angle++,length);
         setColor(sides);
         offset(dx,dy);
         xPos += dx;
@@ -208,6 +221,18 @@ public class Polygon extends Path{
     // Getter method for side length
     public float getLength(){
         return length;
+    }
+    
+    public float getDisplayLength(){
+        return displayLength;
+    }
+    
+    public void setDisplayLength(float nextLength){
+        displayLength = nextLength;
+    }
+    
+    public int getAngle(){
+        return angle;
     }
 
     // Getter methods for location variables

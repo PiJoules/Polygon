@@ -11,6 +11,8 @@ public class Player{
 
     // The size of the oval. Grows as it absorbs other polygons
     private float radius;
+    // The size of the oval to be displayed. May not be same as the actual radius
+    private float displayRadius;
     // The current position of the center of the oval
     private float xPos, yPos;
     // The current velocity of the oval
@@ -35,6 +37,7 @@ public class Player{
         yVel = 0.0f;
 
         radius = rad;
+        displayRadius = rad;
 
         // Create the RectF object centered at x,y
         oval = new RectF(x-radius,y-radius,x+radius,y+radius);
@@ -154,6 +157,14 @@ public class Player{
     public float getRadius(){
         return radius;
     }
+    
+    public float getDisplayRadius(){
+        return displayRadius;
+    }
+    
+    public void setDisplayRadius(float nextRadius){
+        displayRadius = nextRadius;
+    }
 
     // Getter and Setter methods for velocity
     public float getXVel(){
@@ -171,4 +182,5 @@ public class Player{
     public void setYVel(float vy){
         yVel = vy;
     }
+    
 }

@@ -208,8 +208,11 @@ public class Test2 extends Activity implements SensorEventListener{
         private final Paint p = new Paint();
         // The dimensions of the game screen
         private float canvasWidth, canvasHeight;
+        /*private float canvasLeft, canvasTop, canvasRight, canvasBottom;
+        private float canvasdx = 0, canvasdy = 0;*/
         // Boolean to check that the screen has been initialized
         private boolean initialized = false;
+        //private boolean scaling = false;
         
         // The object representing the player character, an oval
         private Player oval;
@@ -218,11 +221,17 @@ public class Test2 extends Activity implements SensorEventListener{
         // object and stored in an ArrayList for ease of additions and deletions
         private final ArrayList<Polygon> polygons;
         // This is the maximum number of enemies that will be inclued on the canvas 
-        private final int ENEMY_LIMIT = 10;
+        /*private final int ENEMY_LIMIT = 10;
+        private float firstSizeLimit;
+        private float nextSizeLimit;
+        private float initSize;
+        private float scaleRatio = 1f;
+        private float lastScaleRatio = scaleRatio;*/
         
         /*
         INSTRUCTIONS WILL CONTROL THE ENEMY LIMIT ABOVE
         */
+        private CanvasInstructions ci;
 
         // To keep the time between each movement constant, we use a frame rate so that the screen
         // will only redraw itself at set intervals and sleep if it completes drawing before the 
@@ -252,8 +261,8 @@ public class Test2 extends Activity implements SensorEventListener{
             p.setColor(Color.BLACK);
             defaultTextSize = p.getTextSize();
             
-            //mp.setVolume(1f, 1f);
-            mp.setVolume(0f, 0f);
+            mp.setVolume(1f, 1f);
+            //mp.setVolume(0f, 0f);
         }
         
         // This is the method that is repeatedly called to redraw the game screen. It controls the
@@ -264,35 +273,108 @@ public class Test2 extends Activity implements SensorEventListener{
 
             if (initialized){
                 
-                if (!paused){
+                ci.updateInstructions(size);
+                boolean shouldScale = ci.shouldScale();
+                if (!shouldScale){
+                    canvas.scale(ci.getScaleRatio(), ci.getScaleRatio(), ci.getCanvasWidth()/2, ci.getCanvasHeight()/2);
+                }
+                else {
+                    canvas.scale(ci.getLastScaleRatio(), ci.getLastScaleRatio(), ci.getCanvasWidth()/2, ci.getCanvasHeight()/2);
+                }
+                for (int i = ci.getCanvasdx().size()-1; i >= 0; i--){
+                    p.setColor(ci.getColors()[i]);
+                    canvas.drawRect(-ci.getCanvasdx().get(i),
+                                    -ci.getCanvasdy().get(i), 
+                                    ci.getCanvasWidth()+ci.getCanvasdx().get(i),
+                                    ci.getCanvasHeight()+ci.getCanvasdy().get(i), p);
+                }
+                
+                /*if (size >= firstSizeLimit && !scaling){
+                    canvas.scale(scaleRatio, scaleRatio, canvasWidth/2, canvasHeight/2);
+                    if (size >= nextSizeLimit){
+                        lastScaleRatio = scaleRatio;
+                        scaleRatio = initSize/size; // the amount by which to shrink the screen (always<1)
+                        canvasdx = 0.5f*canvasWidth*(1/scaleRatio-1);
+                        canvasdy = 0.5f*canvasHeight*(1/scaleRatio-1);
+                        canvasLeft = -canvasdx;
+                        canvasTop = -canvasdy;
+                        canvasRight = canvasWidth + canvasdx;
+                        canvasBottom = canvasHeight + canvasdy;
+                        
+                        firstSizeLimit = nextSizeLimit;
+                        nextSizeLimit++;
+                        scaling = true;
+                    }
+                }*/
+                
+                /*if (scaling){
+                    if (lastScaleRatio-scaleRatio <= 0){
+                        scaling = false;
+                    }
+                    else {
+                        lastScaleRatio -= 0.001f;
+                        canvas.scale(lastScaleRatio,lastScaleRatio,canvasWidth/2,canvasHeight/2);
+                        
+                        p.setColor(Color.MAGENTA);
+                        canvas.drawRect(canvasLeft, canvasTop, canvasRight, canvasBottom, p);
+                        
+                        p.setColor(Color.WHITE);
+                        canvas.drawRect(canvasLeft+canvasdx,canvasTop+canvasdy,canvasRight-canvasdx,canvasBottom-canvasdy,p);
+                    }
+                }*/
+             
+                
+                /*if (!scaling && scaleRatio <= 10f/11f){
+                    p.setColor(Color.MAGENTA);
+                    canvas.drawRect(canvasLeft, canvasTop, canvasRight, canvasBottom, p);
+
+                    p.setColor(Color.WHITE);
+                    canvas.drawRect(canvasLeft+canvasdx,canvasTop+canvasdy,canvasRight-canvasdx,canvasBottom-canvasdy,p);
+                }*/
+                
+                if (!paused && !shouldScale){
                     
                     // Calculate new speed and position of player and move player
                     // Handled in player class
-                    oval.move(accelSensor.getAccelFiltered());
+                    //oval.move(accelSensor.getAccelFiltered(), canvasLeft, canvasTop, canvasRight, canvasBottom);
+                    oval.move(accelSensor.getAccelFiltered(),
+                              ci.getCanvasBounds()[0],
+                              ci.getCanvasBounds()[1],
+                              ci.getCanvasBounds()[2], 
+                              ci.getCanvasBounds()[3]);
 
                     /*
                     INSTRUCTIONS WILL CONTROL THIS PART FOR ADDING NEXT POLYGON
                     */
                     
                     // add another polygon
-                    if(polygons.size() < ENEMY_LIMIT && System.currentTimeMillis() > nextAddition){
+                    //if(polygons.size() < ENEMY_LIMIT && System.currentTimeMillis() > nextAddition){
+                    if (polygons.size() < ci.getEnemyCount() && System.currentTimeMillis() > nextAddition){
                         nextAddition = System.currentTimeMillis() + 1000;
                         Random r = new Random();
                         // Assigns the new polygon a width between 50% and 150% of oval's width
-                        float nextWidth = r.nextFloat()*oval.getRadius()*2+oval.getRadius();
-                        
+                        //float nextWidth = r.nextFloat()*oval.getRadius()*0.7f+oval.getRadius(); // it's actually the radius
+                        float nextWidth = 0.5f*oval.getRadius()+r.nextFloat()*oval.getRadius();
+
                         // Picks a random corner to spawn the new polygon
                         int nextCorner = r.nextInt(4);
                         // Pick random number of sides from 3 to 7 sides
                         int nextSides = r.nextInt(5)+3;
                         // Adds the new polygon to the ArrayList of enemies. Assigns it a random
                         // x and y velocity between .5 and 2.5
-                        polygons.add(new Polygon(nextWidth, nextCorner, r.nextFloat()*2 + 0.5f, r.nextFloat()*2 + 0.5f, canvasWidth, canvasHeight,nextSides));
+                        polygons.add(new Polygon(ci.getEnemyRadius(oval.getRadius()),
+                                                 nextCorner,
+                                                 r.nextFloat()*2 + 0.5f,
+                                                 r.nextFloat()*2 + 0.5f,
+                                                 ci.getCanvasBounds(),
+                                                 ci.getEnemySides()
+                        ));
                     }
                 }
                 
                 // draw the oval on the canvas
-                canvas.drawOval(oval.oval, p);
+                p.setColor(Color.BLACK);
+                canvas.drawCircle(oval.getX(),oval.getY(),oval.getRadius(),p);
                 
                 // An iterator to go through the polygons to move them and check collisions
                 Iterator<Polygon> iter = polygons.iterator();
@@ -300,7 +382,7 @@ public class Test2 extends Activity implements SensorEventListener{
                     Polygon polygon = iter.next();
                 
                     // move polygon if not paused
-                    if (!paused){
+                    if (!paused && !shouldScale){
                         // Call each enemy's move method. Returns whether or not polygon should be removed
                         boolean shouldRemove = polygon.move();
 
@@ -356,6 +438,8 @@ public class Test2 extends Activity implements SensorEventListener{
                 // Place an oval of radius 5 at center of screen
                 size = 10.0f;
                 oval = new Player(canvasWidth/2, canvasHeight/2, size/2, canvasWidth, canvasHeight);
+                
+                ci = new CanvasInstructions(size, 0, 0, canvasWidth, canvasHeight);
             }
     
 
@@ -373,12 +457,12 @@ public class Test2 extends Activity implements SensorEventListener{
             }
 
             // draw text on canvas
-            p.setTextSize(defaultTextSize);
+            p.setTextSize(defaultTextSize/ci.getLastScaleRatio());
             p.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText(Float.toString(((float) misses)/((float) total)), 10, 10, p);
+            canvas.drawText(Float.toString(((float) misses)/((float) total)), 10 - ci.getScalingCanvasdx(), 10 - ci.getScalingCanvasdy() - p.ascent(), p);
             p.setTextAlign(Paint.Align.RIGHT);
-            p.setTextSize(3*defaultTextSize);
-            canvas.drawText(String.format("%.2f", size), canvasWidth-10, 5+p.getTextSize(), p);
+            p.setTextSize(3*defaultTextSize/ci.getLastScaleRatio());
+            canvas.drawText(String.format("%.2f", size), canvasWidth-10 + ci.getScalingCanvasdx(), 5+p.getTextSize() - ci.getScalingCanvasdy(), p);
             
             // Calculate end of next redraw period
             nextReDrawTime = currentTime + FRAME_PERIOD;

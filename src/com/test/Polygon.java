@@ -17,7 +17,8 @@ public class Polygon extends Path{
     private int collisions;
 
     // The dimensions of the game screen
-    private final float canvasWidth, canvasHeight;
+    //private final float canvasWidth, canvasHeight;
+    private final float[] cBounds;
 
     // The length of an edge of the polygon (only squares right now)
     private final float length;
@@ -25,6 +26,8 @@ public class Polygon extends Path{
     // The length of the polygon to be displayed on the canvas
     // May not be the same as the actual length
     private float displayLength;
+    private final float area;
+    private final float radius;
 
     // The position of the polygon's center
     private float xPos, yPos;
@@ -44,11 +47,14 @@ public class Polygon extends Path{
     public final Paint p = new Paint();
 
     // Constructor. Spawns a square of side length len in a random corner with a velocity (vx, vy)
-    public Polygon(float len, int corner, float vx, float vy, float cWidth, float cHeight, int sides){
+    //public Polygon(float len, int corner, float vx, float vy, float cWidth, float cHeight, int sides){
+    public Polygon(float len, int corner, float vx, float vy, float[] cBounds, int sides){
+        len *= 2; // len is the radius, so mult by 2 to get actual width
         
         // Save the dimensions of the canvas for use in other methods
-        canvasWidth = cWidth;
-        canvasHeight = cHeight;
+        //canvasWidth = cWidth;
+        //canvasHeight = cHeight;
+        this.cBounds = cBounds;
 
         // Side length
         length = len;
@@ -62,29 +68,29 @@ public class Polygon extends Path{
         // Set initial position and velocity based on index of corner provided
         if(corner == 0){
             // Spawn polygon in upper left hand corner
-            xPos = len/2.0f;
-            yPos = len/2.0f;
+            xPos = cBounds[0] + len/2.0f;
+            yPos = cBounds[1] + len/2.0f;
             xVel = vx;
             yVel = vy;
         }
         else if(corner == 1){
             // Spawn polygon in upper right hand corner
-            xPos = cWidth - len/2.0f;
-            yPos = len/2.0f;
+            xPos = cBounds[2] - len/2.0f;
+            yPos = cBounds[1] + len/2.0f;
             xVel = -vx;
             yVel = vy;
         }
         else if(corner == 2){
             // Spawn polygon in lower left hand corner
-            xPos = len/2.0f;
-            yPos = cHeight - len/2.0f;
+            xPos = cBounds[0] + len/2.0f;
+            yPos = cBounds[3] - len/2.0f;
             xVel = vx;
             yVel = -vy;
         }
         else if(corner == 3){
             // Spawn polygon in lower right hand corner
-            xPos = cWidth - len/2.0f;
-            yPos = cHeight - len/2.0f;
+            xPos = cBounds[2] - len/2.0f;
+            yPos = cBounds[3] - len/2.0f;
             xVel = -vx;
             yVel = -vy;
         }
@@ -93,29 +99,33 @@ public class Polygon extends Path{
         top = yPos-len/2f;
         right = xPos+len/2f;
         bottom = yPos+len/2f;*/
+        
         setBounds(len/2f);
+        radius = len/2f;
 
         // Creates the new polygon in its corner
         //shape = new RectF(xPos-len/2.0f, yPos-len/2.0f, xPos+len/2.0f, yPos+len/2.0f);
-        setPath(sides,0,length);
+        area = 0.5f*sides*radius*radius*((float)Math.sin(2*Math.PI/(float)sides));
+        
+        setPath(sides,0,radius);
         setColor(sides);
     }
     
     // depends on number of sides, the current angle,
     // current position of the polygon, and the radius of the polygon
-    public void setPath(int n, int angle, float length){
+    public void setPath(int n, int angle, float rad){
         rewind(); // clear all points from the path
         moveTo(
-                (float) (xPos+length*Math.cos(angle*Math.PI/180)),
-                (float) (yPos+length*Math.sin(angle*Math.PI/180)));
+                (float) (xPos+rad*Math.cos(angle*Math.PI/180)),
+                (float) (yPos+rad*Math.sin(angle*Math.PI/180)));
         for (int i = 1; i < n; i++){
-            float nextX = (float) (xPos+length*Math.cos(2*Math.PI*i/n + angle*Math.PI/180));
-            float nextY = (float) (yPos+length*Math.sin(2*Math.PI*i/n + angle*Math.PI/180));
+            float nextX = (float) (xPos+rad*Math.cos(2*Math.PI*i/n + angle*Math.PI/180));
+            float nextY = (float) (yPos+rad*Math.sin(2*Math.PI*i/n + angle*Math.PI/180));
             lineTo(nextX, nextY);
         }
         lineTo(
-                (float) (xPos+length*Math.cos(angle*Math.PI/180)),
-                (float) (yPos+length*Math.sin(angle*Math.PI/180)));
+                (float) (xPos+rad*Math.cos(angle*Math.PI/180)),
+                (float) (yPos+rad*Math.sin(angle*Math.PI/180)));
     }
     
     public void setBounds(float radius){
@@ -136,7 +146,7 @@ public class Polygon extends Path{
     // update the position and boundaries of the polygon after moving
     private void translate(float dx, float dy){
         angle %= 360;
-        setPath(sides,angle++,length);
+        setPath(sides,angle++,radius);
         setColor(sides);
         offset(dx,dy);
         xPos += dx;
@@ -155,9 +165,9 @@ public class Polygon extends Path{
 
         // Check for edge collisions
 
-        if (left < 0){
+        if (left < cBounds[0]){
             // Collision with left side. Place shape at left edge
-            translate(Math.abs(left), 0);
+            translate(Math.abs(left-cBounds[0]), 0);
             
             // Reverse velocity
             xVel = -xVel;
@@ -166,9 +176,9 @@ public class Polygon extends Path{
             collisions++;
         }
 
-        if (top < 0) {
+        if (top < cBounds[1]) {
             // Collision with top side. Place shape at top edge
-            translate(0, Math.abs(top));
+            translate(0, Math.abs(top-cBounds[1]));
             
             // Reverse velocity
             yVel = -yVel;
@@ -177,9 +187,9 @@ public class Polygon extends Path{
             collisions++;
         }
         
-        if (right > canvasWidth){
+        if (right > cBounds[2]){
             // Collision with right side. Place shape at right edge
-            translate(-Math.abs(canvasWidth-right),0);
+            translate(-Math.abs(cBounds[2]-right),0);
             
             // Reverse velocity
             xVel = -xVel;
@@ -188,9 +198,9 @@ public class Polygon extends Path{
             collisions++;
         }
         
-        if (bottom > canvasHeight){
+        if (bottom > cBounds[3]){
             // Collision with bottom side. Place shape at bottom edge
-            translate(0, -Math.abs(canvasHeight-bottom));
+            translate(0, -Math.abs(cBounds[3]-bottom));
             
             // Reverse velocity 
             yVel = -yVel;
@@ -225,6 +235,10 @@ public class Polygon extends Path{
     
     public float getDisplayLength(){
         return displayLength;
+    }
+    
+    public float getArea(){
+        return area;
     }
     
     public void setDisplayLength(float nextLength){

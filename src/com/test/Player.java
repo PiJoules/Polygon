@@ -18,7 +18,7 @@ public class Player{
     // The current velocity of the oval
     private float xVel, yVel;
     // The dimensions of the game screen
-    private final float canvasWidth, canvasHeight;
+    //private final float canvasWidth, canvasHeight;
 
     // Mass of oval. Used to calculate change in velocity
     private final float MASS = 10.0f;
@@ -42,20 +42,22 @@ public class Player{
         // Create the RectF object centered at x,y
         oval = new RectF(x-radius,y-radius,x+radius,y+radius);
 
-        canvasWidth = cWidth;
-        canvasHeight = cHeight;
+        //canvasWidth = cWidth;
+        //canvasHeight = cHeight;
     }
 
 
     // Changes the size of the oval according to the area of the polygon it ate
     public boolean eat(Polygon square){
         // Check if polygon is larger. If so, the oval dies
-        if(square.getLength() > 2.0f*radius){
+        //if(square.getLength() > 2.0f*radius){
+        if (square.getArea() > Math.PI*radius*radius){
             return true; // Oval is dead, return true
         }
 
         // Calculate area of eaten square
-        float area = square.getLength()*square.getLength();
+        //float area = square.getLength()*square.getLength();
+        float area = square.getArea();
         // Calculate new area by adding one tenth the area of eaten polygon
         float newArea = area/10.0f + (float) Math.PI*radius*radius;
         // Calculate new radius from new area
@@ -74,7 +76,8 @@ public class Player{
 
 
     // A function to move the oval at each timestep using accelerometer input contained in accel
-    public void move(float[] accel){
+    //public void move(float[] accel, float canvasWidth, float canvasHeight){
+    public void move(float[] accel, float cLeft, float cTop, float cRight, float cBottom){
         // Calculate new velocity and position of oval
 
         // Calculate current velocity for determination of frictional force
@@ -103,30 +106,30 @@ public class Player{
 
         // Check if oval has hit edge of screen
 
-        if (oval.left < 0){
+        if (oval.left < cLeft){
             // Collision with left side. Place oval at left edge
-            oval.offsetTo(0,oval.top);
+            oval.offsetTo(cLeft,oval.top);
             // Reverse velocity and scale x velocity by coefficient of restitution
             xVel = -RESTITUTION*xVel;
         }
 
-        if (oval.top < 0) {
+        if (oval.top < cTop) {
             // Collision with top side. Place oval at top edge
-            oval.offsetTo(oval.left,0);
+            oval.offsetTo(oval.left,cTop);
             // Reverse velocity and scale y velocity by coefficient of restitution
             yVel = -RESTITUTION*yVel;
         }
         
-        if (oval.right > canvasWidth){
+        if (oval.right > cRight){
             // Collision with right side. Place oval at right edge
-            oval.offsetTo(canvasWidth-oval.width(),oval.top);
+            oval.offsetTo(cRight-oval.width(),oval.top);
             // Reverse velocity and scale x velocity by coefficient of restitution
             xVel = -RESTITUTION*yVel;
         }
         
-        if (oval.bottom > canvasHeight){
+        if (oval.bottom > cBottom){
             // Collision with bottom side. Place oval at bottom edge
-            oval.offsetTo(oval.left,canvasHeight-oval.height());
+            oval.offsetTo(oval.left,cBottom-oval.height());
             // Reverse velocity and scale y velocity by coefficient of restitution
             yVel = -RESTITUTION*yVel;
         }

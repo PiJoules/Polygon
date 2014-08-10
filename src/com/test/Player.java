@@ -17,8 +17,7 @@ public class Player{
     private float xPos, yPos;
     // The current velocity of the oval
     private float xVel, yVel;
-    // The dimensions of the game screen
-    //private final float canvasWidth, canvasHeight;
+    private final float initXVel, initYVel;
 
     // Mass of oval. Used to calculate change in velocity
     private final float MASS = 10.0f;
@@ -28,35 +27,31 @@ public class Player{
     private final float VISCOSITY = 0.20f;    
 
 
-    // Class constructor. Creates a circle of radius rad at (x,y)
     public Player(float x, float y, float rad, float cWidth, float cHeight){
         xPos = x;
         yPos = y;
 
         xVel = 0.0f;
         yVel = 0.0f;
+        initXVel = xVel;
+        initYVel = yVel;
 
         radius = rad;
         displayRadius = rad;
 
         // Create the RectF object centered at x,y
         oval = new RectF(x-radius,y-radius,x+radius,y+radius);
-
-        //canvasWidth = cWidth;
-        //canvasHeight = cHeight;
     }
 
 
     // Changes the size of the oval according to the area of the polygon it ate
     public boolean eat(Polygon square){
         // Check if polygon is larger. If so, the oval dies
-        //if(square.getLength() > 2.0f*radius){
         if (square.getArea() > Math.PI*radius*radius){
             return true; // Oval is dead, return true
         }
 
-        // Calculate area of eaten square
-        //float area = square.getLength()*square.getLength();
+        // Calculate area of eaten polygon
         float area = square.getArea();
         // Calculate new area by adding one tenth the area of eaten polygon
         float newArea = area/10.0f + (float) Math.PI*radius*radius;
@@ -76,8 +71,7 @@ public class Player{
 
 
     // A function to move the oval at each timestep using accelerometer input contained in accel
-    //public void move(float[] accel, float canvasWidth, float canvasHeight){
-    public void move(float[] accel, float cLeft, float cTop, float cRight, float cBottom){
+    public void move(float[] accel, float cLeft, float cTop, float cRight, float cBottom, float scaleRatio){
         // Calculate new velocity and position of oval
 
         // Calculate current velocity for determination of frictional force
@@ -102,7 +96,7 @@ public class Player{
         
 
         // Set new position by moving oval in direction of its velocity
-        oval.offset(xVel, yVel);
+        oval.offset(xVel/scaleRatio, yVel/scaleRatio);
 
         // Check if oval has hit edge of screen
 
@@ -173,9 +167,17 @@ public class Player{
     public float getXVel(){
         return xVel;
     }
+    
+    public float getInitXVel(){
+        return initXVel;
+    }
 
     public float getYVel(){
         return yVel;
+    }
+    
+    public float getInitYVel(){
+        return initYVel;
     }
 
     public void setXVel(float vx){

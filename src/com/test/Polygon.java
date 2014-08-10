@@ -17,7 +17,6 @@ public class Polygon extends Path{
     private int collisions;
 
     // The dimensions of the game screen
-    //private final float canvasWidth, canvasHeight;
     private final float[] cBounds;
 
     // The length of an edge of the polygon (only squares right now)
@@ -47,13 +46,10 @@ public class Polygon extends Path{
     public final Paint p = new Paint();
 
     // Constructor. Spawns a square of side length len in a random corner with a velocity (vx, vy)
-    //public Polygon(float len, int corner, float vx, float vy, float cWidth, float cHeight, int sides){
     public Polygon(float len, int corner, float vx, float vy, float[] cBounds, int sides){
         len *= 2; // len is the radius, so mult by 2 to get actual width
         
         // Save the dimensions of the canvas for use in other methods
-        //canvasWidth = cWidth;
-        //canvasHeight = cHeight;
         this.cBounds = cBounds;
 
         // Side length
@@ -95,16 +91,10 @@ public class Polygon extends Path{
             yVel = -vy;
         }
         
-        /*left = xPos-len/2f;
-        top = yPos-len/2f;
-        right = xPos+len/2f;
-        bottom = yPos+len/2f;*/
-        
         setBounds(len/2f);
         radius = len/2f;
 
         // Creates the new polygon in its corner
-        //shape = new RectF(xPos-len/2.0f, yPos-len/2.0f, xPos+len/2.0f, yPos+len/2.0f);
         area = 0.5f*sides*radius*radius*((float)Math.sin(2*Math.PI/(float)sides));
         
         setPath(sides,0,radius);
@@ -140,6 +130,7 @@ public class Polygon extends Path{
         else if (n == 4) p.setARGB(255, 255, 165, 0);
         else if (n == 5) p.setColor(Color.GREEN);
         else if (n == 6) p.setColor(Color.BLUE);
+        else if (n == 7) p.setARGB(255,204,0,102);
         else p.setARGB(255, 128, 0, 128);
     }
     

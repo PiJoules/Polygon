@@ -14,21 +14,20 @@ public class CanvasInstructions {
     private final Random r = new Random();
     
     // polygon properties
-    private final int[] enemyCount = {5,7,10}; // total number of enemies allowed on screen
-    private final int[] enemySideRange = {0,1,4}; // max number of sides from enemy (3 + enemySideRange)
-    private final float[] enemyLengthRange = {0.7f,0.8f,1f}; // max enemy width = 0.5*(player width) + enemyLengthRange
+    private final int[] enemyCount = {5,6,7,8,9,10}; // total number of enemies allowed on screen
+    private final int[] enemySideRange = {0,1,2,3,4,5}; // max number of sides from enemy (3 + enemySideRange)
+    private final float[] enemyLengthRange = {0.6f,0.7f,0.8f,0.9f,1f,1.2f}; // max enemy width = 0.5*(player width) + enemyLengthRange
     
     // player properties
     private final float initSize;
     
     // canvas properties
-    private final int[] colors = {Color.WHITE,Color.MAGENTA,Color.YELLOW};
-    private final float[] sizeLimits = {0,11,13};
+    private final int[] colors = {Color.WHITE,Color.rgb(255, 165, 0),Color.GREEN,Color.BLUE,Color.rgb(204,0,102),Color.rgb(128, 0, 128)};
+    private final float[] sizeLimits = {0,11,13,16,20,30};
     private int sizeLimitIterator = 0;
     private float scaleRatio = 1f;
     private float lastScaleRatio = scaleRatio;
     private float scaleRatioStep = 0f;
-    //private float canvasdx = 0, canvasdy = 0, scalingCanvasdx = 0, scalingCanvasdy = 0;
     private float scalingCanvasdx = 0, scalingCanvasdy = 0;
     private final ArrayList<Float> canvasdx = new ArrayList<Float>(), canvasdy = new ArrayList<Float>();
     private float[] canvasBounds = new float[4];
@@ -52,12 +51,6 @@ public class CanvasInstructions {
             if (size > sizeLimits[sizeLimitIterator+1]){
                 lastScaleRatio = scaleRatio;
                 scaleRatio = initSize/size;
-                /*canvasdx = 0.5f*canvasWidth*(1/scaleRatio-1);
-                canvasdy = 0.5f*canvasHeight*(1/scaleRatio-1);
-                canvasBounds[0] = -canvasdx;
-                canvasBounds[1] = -canvasdy;
-                canvasBounds[2] = canvasWidth + canvasdx;
-                canvasBounds[3] = canvasHeight + canvasdy;*/
                 canvasdx.add(0.5f*canvasWidth*(1/scaleRatio-1));
                 canvasdy.add(0.5f*canvasHeight*(1/scaleRatio-1));
                 canvasBounds[0] = -canvasdx.get(canvasdx.size()-1);
@@ -70,21 +63,6 @@ public class CanvasInstructions {
                 sizeLimitIterator++;
             }
         }
-    }
-    
-    public void setPolygonProperties(Polygon polygon, float length){
-        polygon.setDisplayLength(length);
-        polygon.setBounds(length/2);
-        polygon.setPath(polygon.getSides(), polygon.getAngle(), length/2);
-    }
-    
-    public void setPlayerProperties(Player player, float radius){
-        player.setDisplayRadius(radius);
-        float left = player.getX()-radius;
-        float right = player.getX()+radius;
-        float top = player.getY()-radius;
-        float bottom = player.getY()+radius;
-        player.oval.set(left, top, right, bottom);
     }
     
     public boolean shouldScale(){
@@ -121,9 +99,6 @@ public class CanvasInstructions {
         return scaleRatio;
     }
     
-    /*public float getCanvasdx(){
-        return canvasdx;
-    }*/
     public ArrayList<Float> getCanvasdx(){
         return canvasdx;
     }
@@ -136,9 +111,6 @@ public class CanvasInstructions {
         return scalingCanvasdy;
     }
     
-    /*public float getCanvasdy(){
-        return canvasdy;
-    }*/
     public ArrayList<Float> getCanvasdy(){
         return canvasdy;
     }

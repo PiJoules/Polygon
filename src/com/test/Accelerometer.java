@@ -146,7 +146,7 @@ public class Accelerometer{
         pastData.add(new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered});
 
         // Check if filtering is turned on
-        if(filterMode == AccelerometerFileManager.NONE){
+        if(filterMode != AccelerometerFileManager.NONE){
             // Filtering is on, check which type to use
             if(filterMode == AccelerometerFileManager.EMA){
                 // Apply exponential moving average filter

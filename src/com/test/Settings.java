@@ -68,7 +68,7 @@ public class Settings extends Activity {
 
     // this method deletes the contents of the high scoes file using the ScoreManager    
     private void clearScores(){
-        final ScoreManager sm = new ScoreManager(this,null);
+        final ScoreManager sm = new ScoreManager(this);
         // Create alert dialog box
         new AlertDialog.Builder(this)
                 // Set title message

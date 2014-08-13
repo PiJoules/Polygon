@@ -15,8 +15,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.TextView;
 
 // Object that allows the user to change filtering settings
 public class NoiseControl extends Activity implements SensorEventListener {

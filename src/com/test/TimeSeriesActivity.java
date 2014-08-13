@@ -5,6 +5,8 @@ package com.test;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -172,8 +174,8 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         plot.setRangeUpperBoundary(3, BoundaryMode.FIXED); // set the upper limit for the y axiz
         plot.setRangeLowerBoundary(-3, BoundaryMode.FIXED); // set the lower limit for the y axis
         plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, .25); // set the range between each tick on the y axis
-        plot.getLegendWidget().setSize(new SizeMetrics(30, SizeLayoutType.ABSOLUTE, 300, SizeLayoutType.ABSOLUTE)); // resize the legend
-        plot.getLegendWidget().position(50, XLayoutStyle.ABSOLUTE_FROM_RIGHT, 50, YLayoutStyle.ABSOLUTE_FROM_BOTTOM); // add margins to the legend
+        plot.getLegendWidget().setSize(new SizeMetrics(30, SizeLayoutType.ABSOLUTE, 450, SizeLayoutType.ABSOLUTE)); // resize the legend
+        plot.getLegendWidget().position(10, XLayoutStyle.ABSOLUTE_FROM_RIGHT, 50, YLayoutStyle.ABSOLUTE_FROM_BOTTOM); // add margins to the legend
         plot.getLegendWidget().setAnchor(AnchorPosition.RIGHT_BOTTOM); // align the legend to the bottom right corner of the screen
         plot.setRangeLabel("Acceleration (g)"); // set the y axis label
         plot.setDomainLabel("Data Point Number"); // set the x axis label
@@ -236,6 +238,12 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
                 Color.TRANSPARENT,
                 null
         );
+        Paint redDashPaint = new Paint();
+        redDashPaint.setColor(Color.RED);
+        redDashPaint.setStyle(Paint.Style.STROKE);
+        redDashPaint.setStrokeWidth(3);
+        redDashPaint.setPathEffect(new DashPathEffect(new float[] {10,5}, 0));
+        XAccelUnfilteredFormat.setLinePaint(redDashPaint);
         
         // color the Raw YAccelSeries green
         YAccelUnfilteredFormat = new LineAndPointFormatter(
@@ -244,6 +252,12 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
                 Color.TRANSPARENT,
                 null
         );
+        Paint greenDashPaint = new Paint();
+        greenDashPaint.setColor(Color.GREEN);
+        greenDashPaint.setStyle(Paint.Style.STROKE);
+        greenDashPaint.setStrokeWidth(3);
+        greenDashPaint.setPathEffect(new DashPathEffect(new float[] {10,5}, 0));
+        YAccelUnfilteredFormat.setLinePaint(greenDashPaint);
         
         // color the Raw ZAccelSeries blue
         ZAccelUnfilteredFormat = new LineAndPointFormatter(
@@ -252,6 +266,12 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
                 Color.TRANSPARENT,
                 null
         );
+        Paint blueDashPaint = new Paint();
+        blueDashPaint.setColor(Color.BLUE);
+        blueDashPaint.setStyle(Paint.Style.STROKE);
+        blueDashPaint.setStrokeWidth(3);
+        blueDashPaint.setPathEffect(new DashPathEffect(new float[] {10,5}, 0));
+        ZAccelUnfilteredFormat.setLinePaint(blueDashPaint);
         
         // color the thresholdSeries Cyan
         thresholdFormat = new LineAndPointFormatter(

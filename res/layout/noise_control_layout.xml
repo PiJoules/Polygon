@@ -17,6 +17,7 @@
         android:id="@+id/range_min"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_below="@id/title"
         android:background="#808080">
         <TextView
@@ -37,6 +38,7 @@
         android:id="@+id/range_max"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_below="@id/range_min"
         android:background="#808080">
         <TextView
@@ -57,6 +59,7 @@
         android:id="@+id/buffer_size"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_below="@id/range_max"
         android:background="#808080">
         <TextView

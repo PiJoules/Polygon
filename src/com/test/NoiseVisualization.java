@@ -29,9 +29,10 @@ import java.util.ArrayList;
 // the TimeSeriesActivity is an Activity that uses the SensorEventListener for
 // getting accelerometer values
 public class NoiseVisualization extends Activity implements SensorEventListener{
-
-    private XYPlot plot; // the plot on which the graphs will be placed
+    // The plot on which the histogram will be placed
+    private XYPlot plot;
     
+    // Text boxes
     private TextView mean, mean_outside, variance;
 
     // The accelerometer object from which we received accelerometer values
@@ -43,6 +44,9 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
     private int bufferSize;
     // List of past readings 
     private ArrayList<float[]> bufferedData;
+
+    // High and low values for expected range
+    private float range_min, range_max;
 
     // formatters for each series that decorate the lines
     // hide is the transparent decoration for hiding the threshold if necessary
@@ -67,11 +71,17 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
         // Initialize the accelerometer
         accel = new Accelerometer(this,this, false, false);
         
-        // Initiliaze the accelerometer file manager
+        // Initiliaze the accelerometer file manager and get settings
         afm = new AccelerometerFileManager(this, "");
+        float[] accelSettings = afm.getAccelData();
 
-        bufferSize = 1000;
+        // Get buffer size from accelerometer settings
+        bufferSize = (int) accelSettings[AccelerometerFileManager.BUFFER_SIZE];
         bufferedData = new ArrayList<float[]>();
+
+        // Get range min and max from accelerometer settings
+        range_min = accelSettings[AccelerometerFileManager.RANGE_MIN];
+        range_max = accelSettings[AccelerometerFileManager.RANGE_MAX];
         
         // Initialize text boxes
         mean = (TextView) findViewById(R.id.mean);
@@ -84,9 +94,6 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
         plot.setRangeUpperBoundary(1000, BoundaryMode.FIXED); // set the upper limit for the y axiz
         plot.setRangeLowerBoundary(0, BoundaryMode.FIXED); // set the lower limit for the y axis
         plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 100); // set the range between each tick on the y axis
-        //plot.getLegendWidget().setSize(new SizeMetrics(30, SizeLayoutType.ABSOLUTE, 300, SizeLayoutType.ABSOLUTE)); // resize the legend
-        //plot.getLegendWidget().position(50, XLayoutStyle.ABSOLUTE_FROM_RIGHT, 50, YLayoutStyle.ABSOLUTE_FROM_BOTTOM); // add margins to the legend
-        //plot.getLegendWidget().setAnchor(AnchorPosition.RIGHT_BOTTOM); // align the legend to the bottom right corner of the screen
         plot.setRangeLabel("Occurences"); // set the y axis label
         plot.setDomainLabel("Acceleration Range"); // set the x axis label
 /*                

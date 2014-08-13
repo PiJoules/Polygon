@@ -10,7 +10,7 @@ public class AccelerometerFileManager extends FileManager {
     // The contents of the settings file
     private String accelContents = "";
     // The array of actual numbers contained in the file
-    private float[] accelData = new float[7];
+    private float[] accelData = new float[10];
     // Constants representing each type of filter
     public static final int NONE = 0;
     public static final int EMA = 1;
@@ -23,6 +23,9 @@ public class AccelerometerFileManager extends FileManager {
     public static final int X_OFFSET = 4;
     public static final int Y_OFFSET = 5;
     public static final int Z_OFFSET = 6;
+    public static final int BUFFER_SIZE = 7;
+    public static final int RANGE_MIN = 8;
+    public static final int RANGE_MAX = 9;
     
 
     // Constuctor
@@ -62,39 +65,31 @@ public class AccelerometerFileManager extends FileManager {
     }
     
     // Method to edit the filtering settings
-    public void changeAccelFileContents(int filterType, float alpha, int sma, float threshold, float[] offset){
+    public void changeAccelFileContents(float[] newData){
         // The text of the file
         String content =
-                "filterType" + DELIMETER + filterType + DELIMETER2 +
-                "alpha" + DELIMETER + alpha + DELIMETER2 +
-                "sma" + DELIMETER + sma + DELIMETER2 +
-                "threshold" + DELIMETER + threshold + DELIMETER2 +
-                "x offset" + DELIMETER + offset[0] + DELIMETER2 +
-                "y offset" + DELIMETER + offset[1] + DELIMETER2 +
-                "z offset" + DELIMETER + offset[2]
+                "filterType" + DELIMETER + newData[TYPE] + DELIMETER2 +
+                "alpha" + DELIMETER + newData[ALPHA] + DELIMETER2 +
+                "sma" + DELIMETER + newData[PERIODS] + DELIMETER2 +
+                "threshold" + DELIMETER + newData[THRESHOLD] + DELIMETER2 +
+                "x offset" + DELIMETER + newData[X_OFFSET] + DELIMETER2 +
+                "y offset" + DELIMETER + newData[Y_OFFSET] + DELIMETER2 +
+                "z offset" + DELIMETER + newData[Z_OFFSET] + DELIMETER2 +
+                "buffer size" + DELIMETER + newData[BUFFER_SIZE] + DELIMETER2 +
+                "range min" + DELIMETER + newData[RANGE_MIN] + DELIMETER2 +
+                "range max" + DELIMETER + newData[RANGE_MAX]
                 ;
 
         this.accelContents = content;
-        // Save the filter type
-        // 0 = no filter, 1 = alpha, 2 = sma
-        accelData[TYPE] = (float) filterType;
-        // Save the alpha constant
-        accelData[ALPHA] = alpha;
-        // Save the number of periods for the SMA
-        accelData[PERIODS] = (float) sma;
-        // Save the threshold value to use
-        accelData[THRESHOLD] = threshold;
-        // Save the acceleration offset values
-        accelData[X_OFFSET] = offset[0];
-        accelData[Y_OFFSET] = offset[1];
-        accelData[Z_OFFSET] = offset[2];
+        // Save new settings
+        accelData = newData;
         // Write settings to file
         writeData(content);
     }
     
     // Method that deletes current contents of file to default values
     public void clearAccelFile(){
-        changeAccelFileContents(0, 1f, 1, 5f, new float[]{0, 0, 0});
+        changeAccelFileContents(new float[]{0, 1f, 1, 5f, 0, 0, 0, 1000, .9f, 1.1f});
     }
     
     // Get filter from file
@@ -105,28 +100,46 @@ public class AccelerometerFileManager extends FileManager {
 
     // Setter methods for filtering settings
     public void setFilter(int newType){
-        changeAccelFileContents(newType, accelData[ALPHA], (int) accelData[PERIODS], accelData[THRESHOLD],
-            new float[]{accelData[X_OFFSET], accelData[Y_OFFSET], accelData[Z_OFFSET]});
+        accelData[TYPE] = newType;
+        changeAccelFileContents(accelData);
     }
 
     public void setAlpha(float newAlpha){
-        changeAccelFileContents((int) accelData[TYPE], newAlpha, (int) accelData[PERIODS], accelData[THRESHOLD],
-            new float[]{accelData[X_OFFSET], accelData[Y_OFFSET], accelData[Z_OFFSET]});
+        accelData[ALPHA] = newAlpha;
+        changeAccelFileContents(accelData);
     }
 
     public void setPeriods(int newPeriods){
-        changeAccelFileContents((int) accelData[TYPE], accelData[ALPHA], newPeriods, accelData[THRESHOLD],
-            new float[]{accelData[X_OFFSET], accelData[Y_OFFSET], accelData[Z_OFFSET]});
+        accelData[PERIODS] = newPeriods;
+        changeAccelFileContents(accelData);
     }
 
     public void setThreshold(float newThreshold){
-        changeAccelFileContents((int) accelData[TYPE], accelData[ALPHA], (int) accelData[PERIODS], newThreshold,
-            new float[]{accelData[X_OFFSET], accelData[Y_OFFSET], accelData[Z_OFFSET]});
+        accelData[THRESHOLD] = newThreshold;
+        changeAccelFileContents(accelData);
     }
 
     public void setOffset(float[] newOffset){
-        changeAccelFileContents((int) accelData[TYPE], accelData[ALPHA], (int) accelData[PERIODS], accelData[THRESHOLD],
-            newOffset);
+        accelData[X_OFFSET] = newOffset[0];
+        accelData[Y_OFFSET] = newOffset[1];
+        accelData[Z_OFFSET] = newOffset[2];
+        changeAccelFileContents(accelData);
     }
+
+    public void setBuffer(int newSize){
+        accelData[BUFFER_SIZE] = newSize;
+        changeAccelFileContents(accelData);
+    }
+
+    public void setMin(float newMin){
+        accelData[RANGE_MIN] = newMin;
+        changeAccelFileContents(accelData);
+    }
+
+    public void setMax(float newMax){
+        accelData[RANGE_MAX] = newMax;
+        changeAccelFileContents(accelData);
+    }
+
 }
 

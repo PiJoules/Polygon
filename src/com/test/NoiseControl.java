@@ -66,12 +66,12 @@ public class NoiseControl extends Activity implements SensorEventListener {
         // Handler for the noise plot button
         noise_test.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                // Try to save new settings
-                if (saveAllData()){
-                    Intent noiseTest = new Intent(getApplicationContext(), NoiseVisualization.class);
-                    // Send user to noise visualiztion screen
-                    startActivity(noiseTest);
-                }
+                // Save new settings
+                saveAllData();
+                Intent noiseTest = new Intent(getApplicationContext(), NoiseVisualization.class);
+                // Send user to noise visualiztion screen
+                startActivity(noiseTest);
+                
             }
         });
         
@@ -84,9 +84,52 @@ public class NoiseControl extends Activity implements SensorEventListener {
         saveAllData();
     }
     
+    // Method for creating a dialog box that contains the accelerometer plots
+    private void createAlertDialog(String message){
+        new AlertDialog.Builder(this)
+                .setTitle(message)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
+                    public void onClick(DialogInterface dialog, int which){
+                    }
+                }).show();
+    }
+
     // Saves new settings
-    private boolean saveAllData(){
-        return true; // temporary
+    private void saveAllData(){
+        float sizeVal = Float.parseFloat(bufferInput.getText().toString());
+        float minVal = Float.parseFloat(rangeMin.getText().toString());
+        float maxVal = Float.parseFloat(rangeMax.getText().toString());
+        // Make sure buffer size is a positive integer
+        if (sizeVal < 1){
+            sizeVal = 1;
+            bufferInput.setText(sizeVal+"");
+            createAlertDialog("Buffer size was set to 1 since it cannot be less than 1.");
+        }
+        else if (sizeVal%1 != 0){
+            sizeVal = Math.round(sizeVal);
+            bufferInput.setText(sizeVal+"");
+            createAlertDialog("Buffer size was rounded since it must be an integer.");
+        }
+        // Make sure min and max are > 0 and max > min
+        if(minVal < 0){
+            minVal = 0;
+            rangeMin.setText("0.0");
+            createAlertDialog("Minimum may not be negative. Min reset to 0");
+        }
+        if(maxVal < 0){
+            maxVal = 0;
+            rangeMax.setText("0.0");
+            createAlertDialog("Maximum may not be negative. Max reset to 0");
+        }
+        if(minVal > maxVal){
+            maxVal = minVal + .01f;
+            rangeMax.setText(maxVal + "");
+            createAlertDialog("Maximum must be greater than minimum");
+        }
+        // Save new settings
+        afm.setBuffer((int) sizeVal);
+        afm.setMax(maxVal);
+        afm.setMin(minVal);
     }
 
     // Event handler for new accelerometer readings. The actual readings are handled elsewhere

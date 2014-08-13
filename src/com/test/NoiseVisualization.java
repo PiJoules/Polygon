@@ -90,10 +90,10 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
 
         // setup and decorate the plot
         plot = (XYPlot) findViewById(R.id.histogram);
-        plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // adjust size of plot
-        plot.setRangeUpperBoundary(1000, BoundaryMode.FIXED); // set the upper limit for the y axiz
+        //plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // adjust size of plot
+        plot.setRangeUpperBoundary(bufferSize, BoundaryMode.FIXED); // set the upper limit for the y axiz
         plot.setRangeLowerBoundary(0, BoundaryMode.FIXED); // set the lower limit for the y axis
-        plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 100); // set the range between each tick on the y axis
+        plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, bufferSize/10); // set the range between each tick on the y axis
         plot.setRangeLabel("Occurences"); // set the y axis label
         plot.setDomainLabel("Acceleration Range"); // set the x axis label
 /*                

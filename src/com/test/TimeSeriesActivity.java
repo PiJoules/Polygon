@@ -36,10 +36,15 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
     
     // the initial arraylists holding the values for each vector
     // and one for the constant threshold value
-    private ArrayList<Number> XAccel, YAccel, ZAccel, threshold;
+    private ArrayList<Number> XAccel, YAccel, ZAccel, 
+                              XAccelUnfiltered, YAccelUnfiltered, ZAccelUnfiltered,
+                              threshold;
     
     // the series that will be plotted on the plot
-    private SimpleXYSeries XAccelSeries, YAccelSeries, ZAccelSeries, thresholdSeries;
+    private SimpleXYSeries XAccelSeries, YAccelSeries, ZAccelSeries,
+            XAccelUnfilteredSeries, YAccelUnfilteredSeries, ZAccelUnfilteredSeries,
+            thresholdSeries;
+            
     private final int ARRAYSIZE = 100; // number of data points per series that will be displayed on the plot
     private int sensorCount = 1; // the number of data points retrieved form accelerometer
     private Accelerometer accel; // the accelerometer object from which we received accelerometer values
@@ -48,7 +53,9 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
     
     // formatters for each series that decorate the lines
     // hide is the transparent decoration for hiding the threshold if necessary
-    private LineAndPointFormatter XAccelFormat, YAccelFormat, ZAccelFormat, thresholdFormat, hide;
+    private LineAndPointFormatter XAccelFormat, YAccelFormat, ZAccelFormat,
+                                  XAccelUnfilteredFormat, YAccelUnfilteredFormat, ZAccelUnfilteredFormat,
+                                  thresholdFormat, hide;
     
     // accelerometer file manager for handling the text file that stores alpha and sma values
     private AccelerometerFileManager afm;
@@ -82,6 +89,10 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         XAccel = new ArrayList<Number>();
         YAccel = new ArrayList<Number>();
         ZAccel = new ArrayList<Number>();
+        XAccelUnfiltered = new ArrayList<Number>();
+        YAccelUnfiltered = new ArrayList<Number>();
+        ZAccelUnfiltered = new ArrayList<Number>();
+
         threshold = new ArrayList<Number>();
         
         // fill up the arraylists with initial values
@@ -89,6 +100,9 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
             XAccel.add(0);
             YAccel.add(0);
             ZAccel.add(0);
+            XAccelUnfiltered.add(0);
+            YAccelUnfiltered.add(0);
+            ZAccelUnfiltered.add(0);
             
             // the fourth element in the accelerometer file indicates
             // the threshold
@@ -184,15 +198,18 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         }
         
         // create XYSeries from xRange and the individual vectors and assign their titles
-        XAccelSeries = new SimpleXYSeries(xRange, XAccel, "XAccel");
-        YAccelSeries = new SimpleXYSeries(xRange, YAccel, "YAccel");
-        ZAccelSeries = new SimpleXYSeries(xRange, ZAccel, "ZAccel");
+        XAccelSeries = new SimpleXYSeries(xRange, XAccel, "Filtered X");
+        YAccelSeries = new SimpleXYSeries(xRange, YAccel, "Filtered Y");
+        ZAccelSeries = new SimpleXYSeries(xRange, ZAccel, "Filtered Z");
+        XAccelUnfilteredSeries = new SimpleXYSeries(xRange, XAccelUnfiltered, "Raw X");
+        YAccelUnfilteredSeries = new SimpleXYSeries(xRange, YAccelUnfiltered, "Raw Y");
+        ZAccelUnfilteredSeries = new SimpleXYSeries(xRange, ZAccelUnfiltered, "Raw Z");     
         thresholdSeries = new SimpleXYSeries(xRange, threshold, "Threshold");
-        
+
         // color the XAccelSeries red
         XAccelFormat = new LineAndPointFormatter(
                 Color.RED,
-                Color.RED,
+                Color.TRANSPARENT,
                 Color.TRANSPARENT,
                 null
         );
@@ -200,15 +217,38 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         // color the YAccelSeries green
         YAccelFormat = new LineAndPointFormatter(
                 Color.GREEN,
-                Color.GREEN,
+                Color.TRANSPARENT,
                 Color.TRANSPARENT,
                 null
         );
         
-        // color the ZAccelSeries blue
+        // color the XAccelSeries blue
         ZAccelFormat = new LineAndPointFormatter(
                 Color.BLUE,
+                Color.TRANSPARENT,
+                Color.TRANSPARENT,
+                null
+        );
+        // color the Raw XAccelSeries
+        XAccelUnfilteredFormat = new LineAndPointFormatter(
+                Color.RED,
+                Color.TRANSPARENT,
+                Color.TRANSPARENT,
+                null
+        );
+        
+        // color the Raw YAccelSeries green
+        YAccelUnfilteredFormat = new LineAndPointFormatter(
+                Color.GREEN,
+                Color.TRANSPARENT,
+                Color.TRANSPARENT,
+                null
+        );
+        
+        // color the Raw ZAccelSeries blue
+        ZAccelUnfilteredFormat = new LineAndPointFormatter(
                 Color.BLUE,
+                Color.TRANSPARENT,
                 Color.TRANSPARENT,
                 null
         );
@@ -216,7 +256,7 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         // color the thresholdSeries Cyan
         thresholdFormat = new LineAndPointFormatter(
                 Color.CYAN,
-                Color.CYAN,
+                Color.TRANSPARENT,
                 Color.TRANSPARENT,
                 null
         );
@@ -239,6 +279,9 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         plot.addSeries(XAccelSeries, XAccelFormat);
         plot.addSeries(YAccelSeries, YAccelFormat);
         plot.addSeries(ZAccelSeries, ZAccelFormat);
+        plot.addSeries(XAccelUnfilteredSeries, XAccelUnfilteredFormat);
+        plot.addSeries(YAccelUnfilteredSeries, YAccelUnfilteredFormat);
+        plot.addSeries(ZAccelUnfilteredSeries, ZAccelUnfilteredFormat);
         
         // show the threshold series only if showThreshold is true
         if (showThreshold) plot.addSeries(thresholdSeries, thresholdFormat);
@@ -260,10 +303,16 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
             XAccelSeries.addLast(sensorCount, accel.getAccel()[0]/9.81f);
             YAccelSeries.addLast(sensorCount, accel.getAccel()[1]/9.81f);
             ZAccelSeries.addLast(sensorCount, accel.getAccel()[2]/9.81f);
+            XAccelUnfilteredSeries.addLast(sensorCount, accel.getAccelUnfiltered()[0]/9.81f);
+            YAccelUnfilteredSeries.addLast(sensorCount, accel.getAccelUnfiltered()[1]/9.81f);
+            ZAccelUnfilteredSeries.addLast(sensorCount, accel.getAccelUnfiltered()[2]/9.81f);
             thresholdSeries.addLast(sensorCount, afm.getAccelData()[3]/9.81f);
             XAccelSeries.removeFirst();
             YAccelSeries.removeFirst();
             ZAccelSeries.removeFirst();
+            XAccelUnfilteredSeries.removeFirst();
+            YAccelUnfilteredSeries.removeFirst();
+            ZAccelUnfilteredSeries.removeFirst();
             thresholdSeries.removeFirst();
             
             // only check if each vector crossed the threshold if showthreshold is true

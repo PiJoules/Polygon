@@ -21,7 +21,7 @@ public class NoiseControl extends Activity implements SensorEventListener {
     // Buttons
     private Button done, noise_test;
     // EditTexts
-    private EditText rangeMin, rangeMax, bufferInput;
+    private EditText rangeMin, rangeMax, bufferInput, bins;
     // File manager for the GUI settings
     private AccelerometerFileManager afm;
 
@@ -49,6 +49,7 @@ public class NoiseControl extends Activity implements SensorEventListener {
         rangeMin = (EditText) findViewById(R.id.range_min_val);
         rangeMax = (EditText) findViewById(R.id.range_max_val);
         bufferInput = (EditText) findViewById(R.id.buffer_size_val);
+        bins = (EditText) findViewById(R.id.bins_val);
 
         // Done button that allows the user to exit the Activity
         done = (Button) findViewById(R.id.done);
@@ -97,6 +98,8 @@ public class NoiseControl extends Activity implements SensorEventListener {
         float sizeVal = Float.parseFloat(bufferInput.getText().toString());
         float minVal = Float.parseFloat(rangeMin.getText().toString());
         float maxVal = Float.parseFloat(rangeMax.getText().toString());
+        float binsVal = Float.parseFloat(bins.getText().toString());
+        
         // Make sure buffer size is a positive integer
         if (sizeVal < 1){
             sizeVal = 1;
@@ -124,10 +127,23 @@ public class NoiseControl extends Activity implements SensorEventListener {
             rangeMax.setText(maxVal + "");
             createAlertDialog("Maximum must be greater than minimum");
         }
+        // Make sure number of bins is a positive integer
+        if (binsVal < 1){
+            binsVal = 1;
+            bins.setText(binsVal+"");
+            createAlertDialog("Number of bins was set to 1 since it cannot be less than 1.");
+        }
+        else if (binsVal%1 != 0){
+            binsVal = Math.round(binsVal);
+            bins.setText(binsVal+"");
+            createAlertDialog("Number of bins was rounded since it must be an integer.");
+        }
+        
         // Save new settings
         afm.setBuffer((int) sizeVal);
         afm.setMax(maxVal);
         afm.setMin(minVal);
+        afm.setBins((int) binsVal);
     }
 
     // Event handler for new accelerometer readings. The actual readings are handled elsewhere

@@ -15,6 +15,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.media.MediaPlayer;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -249,8 +250,8 @@ public class Test2 extends Activity implements SensorEventListener{
             p.setColor(Color.BLACK);
             defaultTextSize = p.getTextSize();
             
-            mp.setVolume(1f, 1f);
-            //mp.setVolume(0f, 0f);
+            AudioManager audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            mp.setVolume(audio.getStreamVolume(AudioManager.STREAM_MUSIC), audio.getStreamVolume(AudioManager.STREAM_MUSIC));
         }
         
         // This is the method that is repeatedly called to redraw the game screen. It controls the

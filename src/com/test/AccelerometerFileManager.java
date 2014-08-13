@@ -10,7 +10,7 @@ public class AccelerometerFileManager extends FileManager {
     // The contents of the settings file
     private String accelContents = "";
     // The array of actual numbers contained in the file
-    private float[] accelData = new float[10];
+    private float[] accelData = new float[11];
     // Constants representing each type of filter
     public static final int NONE = 0;
     public static final int EMA = 1;
@@ -26,6 +26,7 @@ public class AccelerometerFileManager extends FileManager {
     public static final int BUFFER_SIZE = 7;
     public static final int RANGE_MIN = 8;
     public static final int RANGE_MAX = 9;
+    public static final int BINS = 10;
     
 
     // Constuctor
@@ -77,7 +78,8 @@ public class AccelerometerFileManager extends FileManager {
                 "z offset" + DELIMETER + newData[Z_OFFSET] + DELIMETER2 +
                 "buffer size" + DELIMETER + newData[BUFFER_SIZE] + DELIMETER2 +
                 "range min" + DELIMETER + newData[RANGE_MIN] + DELIMETER2 +
-                "range max" + DELIMETER + newData[RANGE_MAX]
+                "range max" + DELIMETER + newData[RANGE_MAX] + DELIMETER2 +
+                "bins" + DELIMETER + newData[BINS]
                 ;
 
         this.accelContents = content;
@@ -89,7 +91,7 @@ public class AccelerometerFileManager extends FileManager {
     
     // Method that deletes current contents of file to default values
     public void clearAccelFile(){
-        changeAccelFileContents(new float[]{0, 1f, 1, 5f, 0, 0, 0, 1000, .9f, 1.1f});
+        changeAccelFileContents(new float[]{0, 1f, 1, 5f, 0, 0, 0, 1000, .9f, 1.1f, 10f});
     }
     
     // Get filter from file
@@ -141,5 +143,9 @@ public class AccelerometerFileManager extends FileManager {
         changeAccelFileContents(accelData);
     }
 
+    public void setBins(int newBins){
+        accelData[BINS] = newBins;
+        changeAccelFileContents(accelData);
+    }
 }
 

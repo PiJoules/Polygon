@@ -4,6 +4,7 @@ package com.test;
 // accelerometer data
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,7 +12,12 @@ import android.os.Bundle;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.TextView;
+import com.androidplot.ui.SizeLayoutType;
+import com.androidplot.ui.SizeMetrics;
+import com.androidplot.xy.BarFormatter;
 import com.androidplot.xy.BoundaryMode;
+import com.androidplot.xy.PointLabelFormatter;
+import com.androidplot.xy.SimpleXYSeries;
 import com.androidplot.xy.XYPlot;
 import com.androidplot.xy.XYStepMode;
 import java.util.ArrayList;
@@ -24,6 +30,14 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
     
     // Text boxes
     private TextView mean, mean_outside, variance;
+    
+    private ArrayList<Number> XAccel = new ArrayList<Number>(),
+            YAccel = new ArrayList<Number>(),
+            ZAccel = new ArrayList<Number>(),
+            xRange = new ArrayList<Number>();
+    private SimpleXYSeries XAccelNoise, YAccelNoise, ZAccelNoise;
+    private int sensorCount = 1;
+    private BarFormatter bf1;
 
     // The accelerometer object from which we received accelerometer values
     private Accelerometer accel;
@@ -77,68 +91,39 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
         mean = (TextView) findViewById(R.id.mean);
         mean_outside = (TextView) findViewById(R.id.mean_outside);
         variance = (TextView) findViewById(R.id.variance);
+        
+        for (int i = 0; i < 100; i++){
+            XAccel.add(0);
+            YAccel.add(0);
+            ZAccel.add(0);
+            xRange.add(sensorCount++);
+        }
 
         // setup and decorate the plot
         plot = (XYPlot) findViewById(R.id.histogram);
-        //plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // adjust size of plot
+        plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // adjust size of plot
         plot.setRangeUpperBoundary(bufferSize, BoundaryMode.FIXED); // set the upper limit for the y axiz
         plot.setRangeLowerBoundary(0, BoundaryMode.FIXED); // set the lower limit for the y axis
-        plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, bufferSize/10); // set the range between each tick on the y axis
+        plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 0.25); // set the range between each tick on the y axis
         plot.setRangeLabel("Occurences"); // set the y axis label
         plot.setDomainLabel("Acceleration Range"); // set the x axis label
-/*                
+               
         // create XYSeries from xRange and the individual vectors and assign their titles
-        XAccelSeries = new SimpleXYSeries(xRange, XAccel, "XAccel");
-        YAccelSeries = new SimpleXYSeries(xRange, YAccel, "YAccel");
-        ZAccelSeries = new SimpleXYSeries(xRange, ZAccel, "ZAccel");
-        thresholdSeries = new SimpleXYSeries(xRange, threshold, "Threshold");
+        XAccelNoise = new SimpleXYSeries(xRange, XAccel, "XAccel");
+        YAccelNoise = new SimpleXYSeries(xRange, YAccel, "YAccel");
+        ZAccelNoise = new SimpleXYSeries(xRange, ZAccel, "ZAccel");
         
-        // color the XAccelSeries red
-        XAccelFormat = new LineAndPointFormatter(
-                Color.RED,
-                Color.RED,
-                Color.TRANSPARENT,
-                null
-        );
-        
-        // color the YAccelSeries green
-        YAccelFormat = new LineAndPointFormatter(
-                Color.GREEN,
-                Color.GREEN,
-                Color.TRANSPARENT,
-                null
-        );
-        
-        // color the ZAccelSeries blue
-        ZAccelFormat = new LineAndPointFormatter(
-                Color.BLUE,
-                Color.BLUE,
-                Color.TRANSPARENT,
-                null
-        );
-        
-        // color the thresholdSeries Cyan
-        thresholdFormat = new LineAndPointFormatter(
-                Color.CYAN,
-                Color.CYAN,
-                Color.TRANSPARENT,
-                null
-        );
-        
-        // make the threshold series thransparent if the show_hide button is pressed
-        hide = new LineAndPointFormatter(
-                Color.TRANSPARENT,
-                Color.TRANSPARENT,
-                Color.TRANSPARENT,
-                null
-        );
-        */
-        
+        bf1 = new BarFormatter(Color.RED, Color.RED);
+        bf1.setPointLabelFormatter(new PointLabelFormatter(Color.RED));
     }
    
     // method for graphing the series on the xyplot
     private void graph(){
         plot.clear(); // clear the plot
+        
+        plot.addSeries(XAccelNoise, bf1);
+        //plot.addSeries(YAccelNoise, YAccelFormat);
+        //plot.addSeries(ZAccelNoise, ZAccelFormat);
 
         plot.redraw(); // redraw the new data
     }
@@ -170,7 +155,15 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
         float[] var = getVariance();
         variance.setText(String.format("X Variance: %.2f Y\nVariance: %.2f\nZ Variance: %.2f", var[0], var[1], var[2]));
 
-        //graph(); // graph the new data set
+        /*XAccelNoise.addLast(sensorCount, accel.getAccel()[0]/9.81f);
+        YAccelNoise.addLast(sensorCount, accel.getAccel()[1]/9.81f);
+        ZAccelNoise.addLast(sensorCount, accel.getAccel()[2]/9.81f);
+        XAccelNoise.removeFirst();
+        YAccelNoise.removeFirst();
+        ZAccelNoise.removeFirst();*/
+        XAccelNoise.setY(accel.getAccel()[0]/9.81f, 50);
+        
+        graph(); // graph the new data set
     }
 
     public void onAccuracyChanged(Sensor sensor, int accuracy) {

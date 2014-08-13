@@ -23,7 +23,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Expected Range Minimum: "
+            android:text="Expected Range Minimum (g): "
             android:textSize="15dp">
         </TextView>
         <EditText
@@ -44,7 +44,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Expected Range Maximum: "
+            android:text="Expected Range Maximum (g): "
             android:textSize="15dp">
         </TextView>
         <EditText

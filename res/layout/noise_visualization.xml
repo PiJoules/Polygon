@@ -6,6 +6,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:id="@+id/screen">
         <com.androidplot.xy.XYPlot
                 android:id="@+id/histogram"
@@ -17,7 +18,8 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/histogram">
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true">
         <TextView
             android:id="@+id/mean"
             android:layout_width="wrap_content"

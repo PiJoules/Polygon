@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/screen">
+        <com.androidplot.xy.XYPlot
+                android:id="@+id/histogram"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                title="Noise Visualization"
+                renderMode="use_main_thread"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/histogram">
+        <TextView
+            android:id="@+id/mean"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mean: 0"
+            android:background="#ffffff">
+        </TextView>
+        <TextView
+            android:id="@+id/mean_outside"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Mean Out of Range: 0"
+            android:background="#ffffff">
+        </TextView>
+        <TextView
+            android:id="@+id/variance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Variance: 0"
+            android:background="#ffffff">
+        </TextView>
+    </LinearLayout>
+</RelativeLayout>

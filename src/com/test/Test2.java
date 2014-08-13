@@ -110,7 +110,7 @@ public class Test2 extends Activity implements SensorEventListener{
         setContentView(mCustomDrawableView); // finally set the view of the game as the custom view
         
         // Creates the accelerometer object. Passes this Activity to the constructor
-        accelSensor = new Accelerometer(this,this);
+        accelSensor = new Accelerometer(this,this, true, true);
     }
     
     

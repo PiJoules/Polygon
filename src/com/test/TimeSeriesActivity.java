@@ -73,7 +73,7 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         setContentView(R.layout.time_series_example);
         
         // initialize the accelerometer
-        accel = new Accelerometer(this,this);
+        accel = new Accelerometer(this,this, false, false);
         
         // initiliaze the accelerometer file manager
         afm = new AccelerometerFileManager(this, "");
@@ -92,7 +92,7 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
             
             // the fourth element in the accelerometer file indicates
             // the threshold
-            threshold.add(afm.getAccelData()[3]);
+            threshold.add(afm.getAccelData()[3]/9.81f);
             xRange.add(sensorCount++);
         }
         
@@ -155,13 +155,13 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         plot = (XYPlot) findViewById(R.id.plot1);
         plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // asjust size of plot
         plot.getGraphWidget().setAnchor(AnchorPosition.RIGHT_MIDDLE); // center the plot vertically
-        plot.setRangeUpperBoundary(11, BoundaryMode.FIXED); // set the upper limit for the y axiz
-        plot.setRangeLowerBoundary(-11, BoundaryMode.FIXED); // set the lower limit for the y axis
-        plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 1); // set the range between each tick on the y axis
+        plot.setRangeUpperBoundary(3, BoundaryMode.FIXED); // set the upper limit for the y axiz
+        plot.setRangeLowerBoundary(-3, BoundaryMode.FIXED); // set the lower limit for the y axis
+        plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, .25); // set the range between each tick on the y axis
         plot.getLegendWidget().setSize(new SizeMetrics(30, SizeLayoutType.ABSOLUTE, 300, SizeLayoutType.ABSOLUTE)); // resize the legend
         plot.getLegendWidget().position(50, XLayoutStyle.ABSOLUTE_FROM_RIGHT, 50, YLayoutStyle.ABSOLUTE_FROM_BOTTOM); // add margins to the legend
         plot.getLegendWidget().setAnchor(AnchorPosition.RIGHT_BOTTOM); // align the legend to the bottom right corner of the screen
-        plot.setRangeLabel("Acceleration (m/s^2)"); // set the y axis label
+        plot.setRangeLabel("Acceleration (g)"); // set the y axis label
         plot.setDomainLabel("Data Point Number"); // set the x axis label
         
         // check what type of filter should be used
@@ -231,7 +231,7 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
         
     }
     
-    // method fro graphing the series on the xyplot
+    // method for graphing the series on the xyplot
     private void graph(){
         plot.clear(); // clear the plot
 
@@ -257,10 +257,10 @@ public class TimeSeriesActivity extends Activity implements SensorEventListener{
             // add the next filtered or unfiltered accelrometer readings
             // to the end of each of the respective series and remove the 
             // first values of each series to simulate a rolling plot
-            XAccelSeries.addLast(sensorCount, accel.getAccel()[0]);
-            YAccelSeries.addLast(sensorCount, accel.getAccel()[1]);
-            ZAccelSeries.addLast(sensorCount, accel.getAccel()[2]);
-            thresholdSeries.addLast(sensorCount, afm.getAccelData()[3]);
+            XAccelSeries.addLast(sensorCount, accel.getAccel()[0]/9.81f);
+            YAccelSeries.addLast(sensorCount, accel.getAccel()[1]/9.81f);
+            ZAccelSeries.addLast(sensorCount, accel.getAccel()[2]/9.81f);
+            thresholdSeries.addLast(sensorCount, afm.getAccelData()[3]/9.81f);
             XAccelSeries.removeFirst();
             YAccelSeries.removeFirst();
             ZAccelSeries.removeFirst();

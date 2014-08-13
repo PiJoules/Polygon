@@ -16,15 +16,22 @@
         android:id="@+id/filter"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="Filter"
+        android:text="Adjust Filter"
         android:layout_below="@id/title">
+    </Button>
+    <Button
+        android:id="@+id/noise"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Visualise Noise"
+        android:layout_below="@id/filter">
     </Button>
     <Button
         android:id="@+id/clear"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="Clear Local Scores"
-        android:layout_below="@id/filter">
+        android:layout_below="@id/noise">
     </Button>
     <Button
         android:id="@+id/done"

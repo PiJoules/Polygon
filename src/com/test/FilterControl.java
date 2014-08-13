@@ -113,7 +113,7 @@ public class FilterControl extends Activity implements SensorEventListener {
                 }
             }
         });
-        
+
         // Done button that allows the user to exit the Activity
         done = (Button) findViewById(R.id.done);
         // Done button event handler

@@ -16,9 +16,13 @@ import java.util.ArrayList;
 
 public class Accelerometer{
     // Accelerometer readings    
-    private float xAccelRaw, yAccelRaw, zAccelRaw, // Raw uncalibrated, unnormalized readings
+    private float xAccelRaw, yAccelRaw, zAccelRaw, // Unchanged sensor readings
                   xAccelFiltered, yAccelFiltered, zAccelFiltered, // Filtered readings
-                  xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered; // Unfiltered readings
+                  xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered, // Unfiltered but offset readings
+                  xAccelTemp, yAccelTemp, zAccelTemp; // Variables to hold last acceleration readings
+
+    // Estimated current velocity 
+    private float xVel, yVel, zVel;
     
     // The SensorManager 'mSensorManager' is required to enable and register sensors in the phone
     private SensorManager mSensorManager;
@@ -46,6 +50,10 @@ public class Accelerometer{
     
     // Integer indicating which filter (or no filter) to use
     private int filterMode;
+
+    // Additional filtering settings that control whether an offset is used and whether data is
+    // normalized
+    private boolean offset, normalize;
     
 
     /**
@@ -54,7 +62,7 @@ public class Accelerometer{
     * @param a: The Android screen that is using the accelerometer
     * @param sel: The event handler for new accelerometer readings
     */
-    public Accelerometer(Activity a, SensorEventListener sel){
+    public Accelerometer(Activity a, SensorEventListener sel, boolean shouldOffset, boolean shouldNormalize){
     	// Initialize the accelerometer objects
 
         // Create the sensor manager
@@ -84,18 +92,30 @@ public class Accelerometer{
         az_off = settings[AccelerometerFileManager.Z_OFFSET];
 
         // Initialize accelerometer values
-        xAccelRaw = 0.0f;
-        yAccelRaw = 0.0f;
-        zAccelRaw = 0.0f;
         xAccelFiltered = 0.0f;
         yAccelFiltered = 0.0f;
         zAccelFiltered = 0.0f;
         xAccelUnfiltered = 0.0f;
         yAccelUnfiltered = 0.0f;
         zAccelUnfiltered = 0.0f;
+        xAccelTemp = 0.0f;
+        yAccelTemp = 0.0f;
+        zAccelTemp = 0.0f;
+        xAccelRaw = 0.0f;
+        yAccelRaw = 0.0f;
+        zAccelRaw = 0.0f;
+
+        // Initialize velocity
+        xVel = 0.0f;
+        yVel = 0.0f;
+        zVel = 0.0f;
 
         // Initialize array list of past readings
         pastData = new ArrayList<float[]>();
+
+        // Save normalization setting. If this is true, the resultant will always be 1g
+        normalize = shouldNormalize;
+        offset = shouldOffset;
     }
 
 
@@ -133,14 +153,25 @@ public class Accelerometer{
         }
         // Else, readings should only be added, so removing step is skipped
 
-        // Save raw and unfiltered data
-        // Y and X flipped and negated for landscape orientation. 
+        // Save raw acceleration values
         xAccelRaw = -event.values[0];
         yAccelRaw = -event.values[1];
         zAccelRaw = event.values[2];
-        yAccelUnfiltered = xAccelRaw - ax_off;
-        xAccelUnfiltered = yAccelRaw - ay_off;
-        zAccelUnfiltered = zAccelRaw - az_off;
+
+        // Save unfiltered data
+        // Y and X flipped and negated for landscape orientation. 
+        if(offset){
+            // Add in offset to change zero position
+            yAccelUnfiltered = xAccelRaw - ax_off;
+            xAccelUnfiltered = yAccelRaw - ay_off;
+            zAccelUnfiltered = zAccelRaw - az_off;
+        }
+        else{
+            // Do not apply offset to change zero position
+            yAccelUnfiltered = xAccelRaw;
+            xAccelUnfiltered = yAccelRaw;
+            zAccelUnfiltered = zAccelRaw;   
+        }
 
         // Add unfiltered data to history
         pastData.add(new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered});
@@ -181,27 +212,37 @@ public class Accelerometer{
             zAccelFiltered = zAccelUnfiltered;
         }
 
+
+        // Perform trapezoidal numerical intergration on acceleration values to estimate current velocity
+        xVel = xVel + .5f*(xAccelFiltered + xAccelTemp)*1.0f/((float) SensorManager.SENSOR_DELAY_GAME);
+        yVel = yVel + .5f*(yAccelFiltered + yAccelTemp)*1.0f/((float) SensorManager.SENSOR_DELAY_GAME);
+        // Subtract gravity from z velocity
+        zVel = zVel + .5f*(zAccelFiltered + zAccelTemp)*1.0f/((float) SensorManager.SENSOR_DELAY_GAME) - 9.81f;
+
+        // Save current acceleration readings for use in integration
+        xAccelTemp = xAccelFiltered;
+        yAccelTemp = yAccelFiltered;
+        zAccelTemp = zAccelFiltered;
+
+
         // Additional filtering needed for our app. Since the magnitude of the acceleration is not
         // necesarilly 1g, the acceleration is scaled so that it is and the acceleration components
         // act as tilt angles
-
-        // Calculate net acceleration by 
-        float resultant = (float) Math.sqrt(xAccelFiltered*xAccelFiltered +
-                                            yAccelFiltered*yAccelFiltered + 
-                                            zAccelFiltered*zAccelFiltered);
-        
-        // Get accleration components. Scale by 9.81/resultant so net acceleration is 1g
-        xAccelFiltered = xAccelFiltered/resultant*9.81f;
-        yAccelFiltered = yAccelFiltered/resultant*9.81f;
-        zAccelFiltered = zAccelFiltered/resultant*9.81f;
+        if(normalize){
+            // Calculate net acceleration by 
+            float resultant = (float) Math.sqrt(xAccelFiltered*xAccelFiltered +
+                                                yAccelFiltered*yAccelFiltered + 
+                                                zAccelFiltered*zAccelFiltered);
+            
+            // Get accleration components. Scale by 9.81/resultant so net acceleration is 1g
+            xAccelFiltered = xAccelFiltered/resultant*9.81f;
+            yAccelFiltered = yAccelFiltered/resultant*9.81f;
+            zAccelFiltered = zAccelFiltered/resultant*9.81f;
+        }
     }
 
 
     // Getter methods for acceleration data. Returns an array
-    public float[] getAccelRaw(){
-        return new float[]{xAccelRaw, yAccelRaw, zAccelRaw};
-    }
-
     public float[] getAccelFiltered(){
         return new float[]{xAccelFiltered, yAccelFiltered, zAccelFiltered};
     }
@@ -218,6 +259,11 @@ public class Accelerometer{
         }
         // Filtering is off, return unfiltered data
         return new float[]{xAccelUnfiltered, yAccelUnfiltered, zAccelUnfiltered};
+    }
+
+    // Getter method for velocity calculated from numerical intergration
+    public float[] getVelocity(){
+        return new float[]{xVel, yVel, zVel};
     }
 
     // Set the current accelerometer readings as the zero position where the circle will not move

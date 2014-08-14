@@ -2,44 +2,69 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
     <LinearLayout
+        android:orientation="horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:id="@+id/screen">
+        android:id="@+id/screen"
+        android:weightSum="1">
         <com.androidplot.xy.XYPlot
                 android:id="@+id/histogram"
-                android:layout_width="fill_parent"
+                android:layout_weight=".75"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 title="Noise Visualization"
                 renderMode="use_main_thread"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true">
-        <TextView
-            android:id="@+id/mean"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mean: 0"
-            android:background="#ffffff">
-        </TextView>
-        <TextView
-            android:id="@+id/mean_outside"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mean Out of Range: 0"
-            android:background="#ffffff">
-        </TextView>
-        <TextView
-            android:id="@+id/variance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Variance: 0"
-            android:background="#ffffff">
-        </TextView>
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_weight=".25"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/mean"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mean: 0"
+                android:background="#ffffff">
+            </TextView>
+            <TextView
+                android:id="@+id/mean_outside"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Mean Out of Range: 0"
+                android:background="#ffffff">
+            </TextView>
+            <TextView
+                android:id="@+id/variance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Variance: 0"
+                android:background="#ffffff">
+            </TextView>
+            <TextView
+                android:id="@+id/vx"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="vx: 0"
+                android:background="#ffffff">
+            </TextView>
+            <TextView
+                android:id="@+id/vy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="vy: 0"
+                android:background="#ffffff">
+            </TextView>
+            <TextView
+                android:id="@+id/vz"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="vz: 0"
+                android:background="#ffffff">
+            </TextView>
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>

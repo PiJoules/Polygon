@@ -214,10 +214,10 @@ public class Accelerometer{
 
 
         // Perform trapezoidal numerical intergration on acceleration values to estimate current velocity
-        xVel = xVel + .5f*(xAccelFiltered + xAccelTemp)*1.0f/((float) SensorManager.SENSOR_DELAY_GAME);
-        yVel = yVel + .5f*(yAccelFiltered + yAccelTemp)*1.0f/((float) SensorManager.SENSOR_DELAY_GAME);
+        xVel = xVel + .5f*(xAccelFiltered + xAccelTemp)*.02f;
+        yVel = yVel + .5f*(yAccelFiltered + yAccelTemp)*.02f;
         // Subtract gravity from z velocity
-        zVel = zVel + .5f*(zAccelFiltered + zAccelTemp)*1.0f/((float) SensorManager.SENSOR_DELAY_GAME) - 9.81f;
+        zVel = zVel + .5f*(zAccelFiltered + zAccelTemp - 9.81f)*.02f;
 
         // Save current acceleration readings for use in integration
         xAccelTemp = xAccelFiltered;

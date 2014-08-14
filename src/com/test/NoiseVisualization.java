@@ -29,7 +29,7 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
     private XYPlot plot;
     
     // Text boxes
-    private TextView mean, mean_outside, variance;
+    private TextView mean, mean_outside, variance, vx, vy, vz;
     
     private ArrayList<Number> XAccel = new ArrayList<Number>(),
             xRange = new ArrayList<Number>();
@@ -89,7 +89,10 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
         mean = (TextView) findViewById(R.id.mean);
         mean_outside = (TextView) findViewById(R.id.mean_outside);
         variance = (TextView) findViewById(R.id.variance);
-        
+        vx = (TextView) findViewById(R.id.vx);
+        vy = (TextView) findViewById(R.id.vy);
+        vz = (TextView) findViewById(R.id.vz);
+
         for (int i = 0; i < 100; i++){
             XAccel.add(0);
             xRange.add(sensorCount++);
@@ -97,7 +100,7 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
 
         // setup and decorate the plot
         plot = (XYPlot) findViewById(R.id.histogram);
-        plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // adjust size of plot
+        //plot.getGraphWidget().setSize(new SizeMetrics(0.75f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // adjust size of plot
         plot.setRangeUpperBoundary(1.2, BoundaryMode.FIXED); // set the upper limit for the y axiz
         plot.setRangeLowerBoundary(0, BoundaryMode.FIXED); // set the lower limit for the y axis
         plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 0.25); // set the range between each tick on the y axis
@@ -113,6 +116,10 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
    
     // method for graphing the series on the xyplot
     private void graph(){
+        float[] velocity = accel.getVelocity();
+        vx.setText(String.format("vx: %.2f", velocity[0]));
+        vy.setText(String.format("vy: %.2f", velocity[1]));
+        vz.setText(String.format("vz: %.2f", velocity[2]));
         plot.clear(); // clear the plot
         
         plot.addSeries(XAccelNoise, bf1);
@@ -147,7 +154,7 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
         mean.setText(String.format("X Mean: %.2f\nY Mean: %.2f\nZ Mean: %.2f", means[0], means[1], means[2]));
         mean_outside.setText("Mean Out of Range: ");
         float[] var = getVariance();
-        variance.setText(String.format("X Variance: %.2f Y\nVariance: %.2f\nZ Variance: %.2f", var[0], var[1], var[2]));
+        variance.setText(String.format("X Variance: %.2f \nYVariance: %.2f\nZ Variance: %.2f", var[0], var[1], var[2]));
 
         XAccelNoise.setY(accel.getAccel()[0]/9.81f, 50);
         

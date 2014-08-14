@@ -32,10 +32,8 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
     private TextView mean, mean_outside, variance;
     
     private ArrayList<Number> XAccel = new ArrayList<Number>(),
-            YAccel = new ArrayList<Number>(),
-            ZAccel = new ArrayList<Number>(),
             xRange = new ArrayList<Number>();
-    private SimpleXYSeries XAccelNoise, YAccelNoise, ZAccelNoise;
+    private SimpleXYSeries XAccelNoise;
     private int sensorCount = 1;
     private BarFormatter bf1;
 
@@ -94,15 +92,13 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
         
         for (int i = 0; i < 100; i++){
             XAccel.add(0);
-            YAccel.add(0);
-            ZAccel.add(0);
             xRange.add(sensorCount++);
         }
 
         // setup and decorate the plot
         plot = (XYPlot) findViewById(R.id.histogram);
         plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // adjust size of plot
-        plot.setRangeUpperBoundary(bufferSize, BoundaryMode.FIXED); // set the upper limit for the y axiz
+        plot.setRangeUpperBoundary(1.2, BoundaryMode.FIXED); // set the upper limit for the y axiz
         plot.setRangeLowerBoundary(0, BoundaryMode.FIXED); // set the lower limit for the y axis
         plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 0.25); // set the range between each tick on the y axis
         plot.setRangeLabel("Occurences"); // set the y axis label
@@ -110,8 +106,6 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
                
         // create XYSeries from xRange and the individual vectors and assign their titles
         XAccelNoise = new SimpleXYSeries(xRange, XAccel, "XAccel");
-        YAccelNoise = new SimpleXYSeries(xRange, YAccel, "YAccel");
-        ZAccelNoise = new SimpleXYSeries(xRange, ZAccel, "ZAccel");
         
         bf1 = new BarFormatter(Color.RED, Color.RED);
         bf1.setPointLabelFormatter(new PointLabelFormatter(Color.RED));
@@ -155,12 +149,6 @@ public class NoiseVisualization extends Activity implements SensorEventListener{
         float[] var = getVariance();
         variance.setText(String.format("X Variance: %.2f Y\nVariance: %.2f\nZ Variance: %.2f", var[0], var[1], var[2]));
 
-        /*XAccelNoise.addLast(sensorCount, accel.getAccel()[0]/9.81f);
-        YAccelNoise.addLast(sensorCount, accel.getAccel()[1]/9.81f);
-        ZAccelNoise.addLast(sensorCount, accel.getAccel()[2]/9.81f);
-        XAccelNoise.removeFirst();
-        YAccelNoise.removeFirst();
-        ZAccelNoise.removeFirst();*/
         XAccelNoise.setY(accel.getAccel()[0]/9.81f, 50);
         
         graph(); // graph the new data set

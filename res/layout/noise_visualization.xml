@@ -15,56 +15,59 @@
                 android:id="@+id/histogram"
                 android:layout_weight=".75"
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                title="Noise Visualization"
-                renderMode="use_main_thread"/>
-        <LinearLayout
+                android:layout_height="wrap_content"/>
+        <RelativeLayout
             android:orientation="vertical"
             android:layout_weight=".25"
             android:layout_width="0dp"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
             <TextView
-                android:id="@+id/mean"
+                android:id="@+id/means"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:textColor="#000000"
                 android:text="Mean: 0"
-                android:background="#ffffff">
-            </TextView>
-            <TextView
-                android:id="@+id/mean_outside"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Mean Out of Range: 0"
                 android:background="#ffffff">
             </TextView>
             <TextView
                 android:id="@+id/variance"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/means"
+                android:textColor="#000000"
                 android:text="Variance: 0"
                 android:background="#ffffff">
             </TextView>
             <TextView
-                android:id="@+id/vx"
+                android:id="@+id/std"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="vx: 0"
+                android:layout_below="@id/variance"
+                android:textColor="#000000"
                 android:background="#ffffff">
             </TextView>
-            <TextView
-                android:id="@+id/vy"
+            <Button
+                android:id="@+id/switchButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="vy: 0"
-                android:background="#ffffff">
-            </TextView>
-            <TextView
-                android:id="@+id/vz"
+                android:layout_below="@id/std"
+                android:text="Switch to X">
+            </Button>
+            <Button
+                android:id="@+id/pause"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="vz: 0"
-                android:background="#ffffff">
-            </TextView>
-        </LinearLayout>
+                android:text="Pause"
+                android:layout_below="@id/switchButton">
+            </Button>
+            <Button
+                android:id="@+id/done"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:text="Done">
+            </Button>
+        </RelativeLayout>
     </LinearLayout>
 </RelativeLayout>

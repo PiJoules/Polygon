@@ -91,7 +91,7 @@ public class AccelerometerFileManager extends FileManager {
     
     // Method that deletes current contents of file to default values
     public void clearAccelFile(){
-        changeAccelFileContents(new float[]{0, 1f, 1, 5f, 0, 0, 0, 1000, .9f, 1.1f, 10f});
+        changeAccelFileContents(new float[]{0, 1f, 1, 5f, 0, 0, 0, 50, .9f, 1.1f, 10f});
     }
     
     // Get filter from file

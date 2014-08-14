@@ -93,7 +93,7 @@ public class MainMenu extends Activity {
             }
         }
         
-        HTTPManager httpm = new HTTPManager(this);
+        /*HTTPManager httpm = new HTTPManager(this);
         if (httpm.post(sm.getScoreString(), sm.DELIMETER, sm.DELIMETER2)){
             ScoreManager smGlobal = new ScoreManager(this,"global_scores.txt");
             smGlobal.writeData(httpm.getHttpResponse());
@@ -105,7 +105,7 @@ public class MainMenu extends Activity {
                     table2tvs[i][1].setText(globalScores[i][1]);
                 }
             }
-        }
+        }*/
     }
     
 }

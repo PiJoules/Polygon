@@ -6,9 +6,11 @@ This repository contains the source code of the app we are creating for our EPED
 Instructions
 ------------
 
-To play this game, simply open the app and tap the play button. You play as the black circle that spawns in the center. You can move it by tilting your phone. Green squares will spawn in each corner. These are your enemies. You can eat the smaller ones to get bigger. If a bigger square touches you, you lose. The bigger you get, the higher your score!
+To play this game, simply open the app and tap the play button. You play as the black circle that spawns in the center. You can move it by tilting your phone. Polygons will spawn in each corner. These are your enemies. You can eat the smaller ones to get bigger. If a bigger square touches you, you lose. The bigger you get, the higher your score!
 
 You can also change the settings for the filter applied to the accelerometer readings. From the main menu, tap settings. There you can switch between no filter, an exponential moving average filter, and a simple moving average filter. You can change the alpha value used for the EMA filter and the number of periods to use for the SMA filter.
+
+Also on the settings screen you can see a histogram of past accelerometer readings by tapping the Visualize Noise button or a rolling plot of the estimated velocity of the phone by tapping the Visualize Velocities button.
 
 Your best scores will be saved on your phone with the names you enter at the end of the game. To clear these scores, tap Clear Local Scores button.
 

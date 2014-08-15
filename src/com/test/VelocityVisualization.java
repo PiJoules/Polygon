@@ -86,7 +86,9 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         vy = (TextView) findViewById(R.id.vy);
         vz = (TextView) findViewById(R.id.vz);
 
+        // Setup pause/resume button
         pause = (Button) findViewById(R.id.pause);
+        // Action handler for pause button
         pause.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 if (paused){
@@ -102,6 +104,7 @@ public class VelocityVisualization extends Activity implements SensorEventListen
 
         // setup done button; returns to previous screen on click
         done = (Button) findViewById(R.id.done);
+        // Action handler for done button. Exits the screen
         done.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 finish();
@@ -111,7 +114,7 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         // Set up the plot
         plot = (XYPlot) findViewById(R.id.plot);
         plot.setTitle("Velocity Component Plots");
-        plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // asjust size of plot
+        plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // adjust size of plot
         plot.getGraphWidget().setAnchor(AnchorPosition.RIGHT_MIDDLE); // center the plot vertically
         plot.setRangeUpperBoundary(5*1.1, BoundaryMode.FIXED); // set the upper limit for the y axiz
         plot.setRangeLowerBoundary(-5, BoundaryMode.FIXED); // set the lower limit for the y axis
@@ -139,7 +142,7 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         yVelSeries = new SimpleXYSeries(xRange, yVel, "Y Vel");
         zVelSeries = new SimpleXYSeries(xRange, zVel, "Z Vel");
 
-        // color the XAccelSeries red
+        // color the xVelSeries red
         xVelFormat = new LineAndPointFormatter(
                 Color.RED,
                 Color.TRANSPARENT,
@@ -164,6 +167,7 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         );
     }
 
+    // Update the rolling plot
     private void graph(){
         plot.clear(); // clear the plot
 
@@ -217,6 +221,7 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         }
     }
 
+    // Event handler for a change in accuracy. No action needed
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         
     }

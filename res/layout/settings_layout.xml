@@ -2,11 +2,11 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
     <TextView
         android:id="@+id/title"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Settings"
@@ -14,28 +14,35 @@
     </TextView>
     <Button
         android:id="@+id/filter"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Adjust Filter"
         android:layout_below="@id/title">
     </Button>
     <Button
         android:id="@+id/noise"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Visualise Noise"
         android:layout_below="@id/filter">
     </Button>
     <Button
-        android:id="@+id/clear"
-        android:layout_width="fill_parent"
+        android:id="@+id/vels"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Clear Local Scores"
+        android:text="Visualize Velocities"
         android:layout_below="@id/noise">
     </Button>
     <Button
+        android:id="@+id/clear"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Clear Local Scores"
+        android:layout_below="@id/vels">
+    </Button>
+    <Button
         android:id="@+id/done"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:gravity="center"

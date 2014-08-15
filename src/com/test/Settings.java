@@ -14,7 +14,7 @@ import android.widget.Button;
 
 public class Settings extends Activity {
     // Buttons on the settings screen    
-    private Button filter, noise, clear, done;
+    private Button filter, noise, vels, clear, done;
 
     // This method creates the screen (Activity). It overrides the default creation method in the
     // Activity class
@@ -52,6 +52,15 @@ public class Settings extends Activity {
                 // Sends user to the filter control Activity
                 Intent noiseControl = new Intent(getApplicationContext(), NoiseControl.class);
                 startActivity(noiseControl);
+            }
+        });
+        
+        // create vels button
+        vels = (Button) findViewById(R.id.vels);
+        vels.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent velocityControl = new Intent(getApplicationContext(), VelocityControl.class);
+                startActivity(velocityControl);
             }
         });
 

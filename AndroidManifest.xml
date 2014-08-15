@@ -35,5 +35,8 @@
         <activity
             android:name="NoiseVisualization">
         </activity>
+        <activity
+            android:name="VelocityControl">
+        </activity>
     </application>
 </manifest>

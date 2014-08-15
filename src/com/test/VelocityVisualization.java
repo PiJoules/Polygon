@@ -110,12 +110,13 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         
         // Set up the plot
         plot = (XYPlot) findViewById(R.id.plot);
+        plot.setTitle("Velocity Component Plots");
         plot.getGraphWidget().setSize(new SizeMetrics(0.9f, SizeLayoutType.RELATIVE, 1f, SizeLayoutType.RELATIVE)); // asjust size of plot
         plot.getGraphWidget().setAnchor(AnchorPosition.RIGHT_MIDDLE); // center the plot vertically
-        plot.setRangeUpperBoundary(5, BoundaryMode.FIXED); // set the upper limit for the y axiz
+        plot.setRangeUpperBoundary(5*1.1, BoundaryMode.FIXED); // set the upper limit for the y axiz
         plot.setRangeLowerBoundary(-5, BoundaryMode.FIXED); // set the lower limit for the y axis
         plot.setRangeStep(XYStepMode.INCREMENT_BY_VAL, 1); // set the range between each tick on the y axis
-        plot.getLegendWidget().setSize(new SizeMetrics(30, SizeLayoutType.ABSOLUTE, 50, SizeLayoutType.ABSOLUTE)); // resize the legend
+        plot.getLegendWidget().setSize(new SizeMetrics(30, SizeLayoutType.ABSOLUTE, 150, SizeLayoutType.ABSOLUTE)); // resize the legend
         plot.getLegendWidget().position(10, XLayoutStyle.ABSOLUTE_FROM_RIGHT, 50, YLayoutStyle.ABSOLUTE_FROM_BOTTOM); // add margins to the legend
         plot.getLegendWidget().setAnchor(AnchorPosition.RIGHT_BOTTOM); // align the legend to the bottom right corner of the screen
         plot.setRangeLabel("Velocity (m/s)"); // set the y axis label

@@ -27,7 +27,7 @@
         android:layout_below="@id/filter">
     </Button>
     <Button
-        android:id="@+id/vels"
+        android:id="@+id/velocities"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Visualize Velocities"
@@ -38,7 +38,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Clear Local Scores"
-        android:layout_below="@id/vels">
+        android:layout_below="@id/velocities">
     </Button>
     <Button
         android:id="@+id/done"

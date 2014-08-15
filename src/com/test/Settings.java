@@ -56,11 +56,11 @@ public class Settings extends Activity {
         });
         
         // create vels button
-        vels = (Button) findViewById(R.id.vels);
+        vels = (Button) findViewById(R.id.velocities);
         vels.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent velocityControl = new Intent(getApplicationContext(), VelocityControl.class);
-                startActivity(velocityControl);
+                Intent velocityVisualization = new Intent(getApplicationContext(), VelocityVisualization.class);
+                startActivity(velocityVisualization);
             }
         });
 

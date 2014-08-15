@@ -22,6 +22,8 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 
 /**
@@ -56,6 +58,11 @@ public class HTTPManager {
             nameValuePairs.add(new BasicNameValuePair("delimeter2", delimeter2));
             nameValuePairs.add(new BasicNameValuePair("errorflag", ERR));
             httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            
+            // set timeout parameters
+            HttpParams httpParameters = httppost.getParams();
+            HttpConnectionParams.setConnectionTimeout(httpParameters, 3000);
+            HttpConnectionParams.setSoTimeout(httpParameters, 3000);
 
             // Execute HTTP Post Request
             HttpResponse response = httpclient.execute(httppost);

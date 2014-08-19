@@ -14,7 +14,7 @@ import android.widget.Button;
 
 public class Settings extends Activity {
     // Buttons on the settings screen    
-    private Button filter, noise, vels, clear, done;
+    private Button filter, noise, vels, clear, pramod, done;
 
     // This method creates the screen (Activity). It overrides the default creation method in the
     // Activity class
@@ -71,6 +71,16 @@ public class Settings extends Activity {
             public void onClick(View v) {
                 // Deletes locally saved scores
                 clearScores();
+            }
+        });
+        
+        pramod = (Button) findViewById(R.id.pramod);
+        pramod.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                Intent playScreen = new Intent(getApplicationContext(), Test2.class);
+                playScreen.putExtra("pramod", true);
+                // Starts the game
+                startActivity(playScreen);
             }
         });
 

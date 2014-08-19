@@ -1,5 +1,8 @@
 package com.test;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 
 
@@ -25,9 +28,11 @@ public class Player{
     private final float RESTITUTION = 0.4f;
     // A frictional coefficient. Allows more fine control at low speed
     private final float VISCOSITY = 0.20f;    
+    
+    public Bitmap b;
 
 
-    public Player(float x, float y, float rad, float cWidth, float cHeight){
+    public Player(float x, float y, float rad, float cWidth, float cHeight, Context c){
         xPos = x;
         yPos = y;
 
@@ -41,6 +46,8 @@ public class Player{
 
         // Create the RectF object centered at x,y
         oval = new RectF(x-radius,y-radius,x+radius,y+radius);
+        
+        b = BitmapFactory.decodeResource(c.getResources(), R.raw.pramods11);
     }
 
 

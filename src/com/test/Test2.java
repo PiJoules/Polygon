@@ -36,6 +36,8 @@ import java.util.Iterator;
 // accelerometer as a controler
 public class Test2 extends Activity implements SensorEventListener{
     
+    private boolean pramod = false;
+    
     // Custom view variables
     // Create a custom view called 'mCustomDrawableView' that will display the game
     // mCustomDrawableView is a subclass created in this class to allow easier
@@ -73,6 +75,9 @@ public class Test2 extends Activity implements SensorEventListener{
                     
         // setup the custom canvas
         mCustomDrawableView = new CustomDrawableView(this); // set the custom view that contains the game
+        
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) pramod = extras.getBoolean("pramod");
         
         // Add an onClickListener to the custom view so that
         // whenever the user taps on the screen, the game will pause
@@ -309,7 +314,12 @@ public class Test2 extends Activity implements SensorEventListener{
                 
                 // draw the oval on the canvas
                 p.setColor(Color.BLACK);
-                canvas.drawCircle(oval.getX(),oval.getY(),oval.getRadius(),p);
+                if (!pramod){
+                    canvas.drawCircle(oval.getX(),oval.getY(),oval.getRadius(),p);
+                }
+                else {
+                    canvas.drawBitmap(oval.b, oval.getX(), oval.getY(), p);
+                }
                 
                 // An iterator to go through the polygons to move them and check collisions
                 Iterator<Polygon> iter = polygons.iterator();
@@ -372,7 +382,7 @@ public class Test2 extends Activity implements SensorEventListener{
                 // Setup controlled oval
                 // Place an oval of radius 5 at center of screen
                 size = 10.0f;
-                oval = new Player(canvasWidth/2, canvasHeight/2, size/2, canvasWidth, canvasHeight);
+                oval = new Player(canvasWidth/2, canvasHeight/2, size/2, canvasWidth, canvasHeight, getContext());
                 
                 ci = new CanvasInstructions(size, 0, 0, canvasWidth, canvasHeight);
             }

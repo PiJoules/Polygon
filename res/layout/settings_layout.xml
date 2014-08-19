@@ -41,6 +41,13 @@
         android:layout_below="@id/velocities">
     </Button>
     <Button
+        android:id="@+id/pramod"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pramod Mode (Experimental)"
+        android:layout_below="@id/clear">
+    </Button>
+    <Button
         android:id="@+id/done"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

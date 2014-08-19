@@ -32,9 +32,9 @@ public class VelocityVisualization extends Activity implements SensorEventListen
     // The plot on which the graphs will be placed
     private XYPlot plot;
     // Buttons
-    private Button pause, done;
+    private Button pause, done, zero;
     // Text boxes displaying the velocity values
-    private TextView vx, vy, vz;
+    private TextView vx, vy;
 
     // The accelerometer object
     private Accelerometer accel;
@@ -46,7 +46,7 @@ public class VelocityVisualization extends Activity implements SensorEventListen
     // the number of data points retrieved form accelerometer
     private int sensorCount = 1;
     // The initial arraylists holding the values for past velocities
-    private ArrayList<Number> xVel, yVel, zVel;
+    private ArrayList<Number> xVel, yVel;
     // whether the plot is paused or not
     private boolean paused = false;
     // range of x vals to plot against
@@ -54,10 +54,10 @@ public class VelocityVisualization extends Activity implements SensorEventListen
     
     
     // the series that will be plotted on the plot
-    private SimpleXYSeries xVelSeries, yVelSeries, zVelSeries;
+    private SimpleXYSeries xVelSeries, yVelSeries;
     // formatters for each series that decorate the lines
     // hide is the transparent decoration for hiding the threshold if necessary
-    private LineAndPointFormatter xVelFormat, yVelFormat, zVelFormat;
+    private LineAndPointFormatter xVelFormat, yVelFormat;
 
     @Override
     public void onCreate(Bundle icicle) {
@@ -76,7 +76,7 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         setContentView(R.layout.velocity_visualization_layout);
         
         // initialize the accelerometer
-        accel = new Accelerometer(this,this, false, false);
+        accel = new Accelerometer(this,this, true, false);
         
         // initiliaze the accelerometer file manager
         afm = new AccelerometerFileManager(this, "");
@@ -84,7 +84,6 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         // Initialize text boxes
         vx = (TextView) findViewById(R.id.vx);
         vy = (TextView) findViewById(R.id.vy);
-        vz = (TextView) findViewById(R.id.vz);
 
         // Setup pause/resume button
         pause = (Button) findViewById(R.id.pause);
@@ -110,6 +109,15 @@ public class VelocityVisualization extends Activity implements SensorEventListen
                 finish();
             }
         });
+
+        // Setup zero button; Sets accelerometer offset so that current orientation is zero position
+        zero = (Button) findViewById(R.id.zero);
+        // Action handler for zero button. Calibrates the accelerometer and zeros the velocity
+        zero.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                accel.calibrate();
+            }
+        });
         
         // Set up the plot
         plot = (XYPlot) findViewById(R.id.plot);
@@ -128,11 +136,9 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         // fill up the arraylists with initial values
         xVel = new ArrayList<Number>();
         yVel = new ArrayList<Number>();
-        zVel = new ArrayList<Number>();
         for (int i = 0; i < ARRAYSIZE; i++){
             xVel.add(0);
             yVel.add(0);
-            zVel.add(0);
             
             xRange.add(sensorCount++);
         }
@@ -140,7 +146,6 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         // create XYSeries from xRange and the individual vectors and assign their titles
         xVelSeries = new SimpleXYSeries(xRange, xVel, "X Vel");
         yVelSeries = new SimpleXYSeries(xRange, yVel, "Y Vel");
-        zVelSeries = new SimpleXYSeries(xRange, zVel, "Z Vel");
 
         // color the xVelSeries red
         xVelFormat = new LineAndPointFormatter(
@@ -157,14 +162,6 @@ public class VelocityVisualization extends Activity implements SensorEventListen
                 Color.TRANSPARENT,
                 null
         );
-        
-        // color the XVelSeries blue
-        zVelFormat = new LineAndPointFormatter(
-                Color.BLUE,
-                Color.TRANSPARENT,
-                Color.TRANSPARENT,
-                null
-        );
     }
 
     // Update the rolling plot
@@ -174,7 +171,6 @@ public class VelocityVisualization extends Activity implements SensorEventListen
         // add new series' to the xyplot using the appropriate formats
         plot.addSeries(xVelSeries, xVelFormat);
         plot.addSeries(yVelSeries, yVelFormat);
-        plot.addSeries(zVelSeries, zVelFormat);        
 
         plot.redraw(); // redraw the new data
     }
@@ -204,17 +200,15 @@ public class VelocityVisualization extends Activity implements SensorEventListen
             // to the end of each of the respective series
             xVelSeries.addLast(sensorCount, velocity[0]);
             yVelSeries.addLast(sensorCount, velocity[1]);
-            zVelSeries.addLast(sensorCount, velocity[2]);
+            
             // remove the first values of each series to simulate a rolling plot
             xVelSeries.removeFirst();
             yVelSeries.removeFirst();
-            zVelSeries.removeFirst();
             
             // Show the numerical value of the velocities in the text boxes
             vx.setText(String.format("vx: %.3f", velocity[0]));
             vy.setText(String.format("vy: %.3f", velocity[1]));
-            vz.setText(String.format("vz: %.3f", velocity[2]));
-
+            
             // get another data point
             sensorCount++;
             graph(); // graph the new data set

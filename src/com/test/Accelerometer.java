@@ -273,6 +273,9 @@ public class Accelerometer{
         ay_off = yAccelRaw;
         az_off = zAccelRaw - 9.81f;
         afm.setOffset(new float[]{ax_off, ay_off, az_off});
+        xVel = 0f;
+        yVel = 0f;
+        zVel = 0f;
     }
 
     // Set the zero position back to the default position
@@ -281,6 +284,9 @@ public class Accelerometer{
         ay_off = 0f;
         az_off = 0f;
         afm.setOffset(new float[]{0f,0f,0f});
+        xVel = 0f;
+        yVel = 0f;
+        zVel = 0f;
     }
 
 

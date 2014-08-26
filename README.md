@@ -12,7 +12,7 @@ You can also change the settings for the filter applied to the accelerometer rea
 
 Also on the settings screen you can see a histogram of past accelerometer readings by tapping the Visualize Noise button or a rolling plot of the estimated velocity of the phone by tapping the Visualize Velocities button.
 
-Your best scores will be saved on your phone with the names you enter at the end of the game. To clear these scores, tap Clear Local Scores button.
+Your best scores will be saved on your phone with the names you enter at the end of the game. To clear these scores, tap Clear Local Scores button. Scores are also saved globally on a server.
 
 Code
 ----
@@ -29,9 +29,17 @@ Code
 
   * This file defines the Polygon object that represents the squares that are generated. The user must avoid larger squares and eats smaller squares to grow bigger.
 
+* CanvasInstructions.java
+
+  * This file controls the instructions and flow of the game by defining player and polygon properties, the size and scale of the canvas, the level, and what is displayed on the screen in general.
+
 * Accelerometer.java
 
   * This file defines the Acclerometer object. It applies filtering according to user defined settings to the accelerometer readings.
+
+* AccelerometerFileManager.java
+
+  * This file is used to keep track of the accelerometer constants set by the user. These constants and filter settings are saved into a text file inthe phone.
 
 * FileManager.java
 
@@ -40,6 +48,10 @@ Code
 * ScoreManager.java
 
   * This file is used to keep track of the highest scores acheived in the game. It saves the highest scores to the phone.
+
+* HTTPManager.java
+
+  * This file contains the functions for posting local high scores onto a server that will hold all high scores from each player on each phone.
 
 * MainMenu.java
 
@@ -53,9 +65,29 @@ Code
 
   * This file outlines the interface that allows the user to change the accelerometer settings. It also creates plots using AndroidPlot (see more under dependencies)
 
+* NoiseControl.java
+
+  * This file outlines the interface that allows the user to change the histogram settings for the accelerometer noise. It also creates plots using AndroidPlot (see more under dependencies)
+
+* NoiseVisualization.java
+
+  * This file controls the histograms of the accelerometer noise.
+
 * TimeSeriesActivity.java
 
   * This file controls the plots of the filtered and unfiltered acclerometer readings.
+
+* VelocityVisualization.java
+
+  * This file controls the plots of the velocities of the phone caluclated from acceleration by trapezoidal integration.
+
+* MyBarFormatter.java
+
+  * This file is used for formatting the histogram of the noise.
+
+* MyBarRenderer.java
+
+  * This file is used for rendering the histogram of the noise.
 
 * res/
 

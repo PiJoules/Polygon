@@ -13,21 +13,21 @@ public class Player{
     public RectF oval; // Public so that main canvas can access it
 
     // The size of the oval. Grows as it absorbs other polygons
-    private float radius;
+    protected float radius;
     // The size of the oval to be displayed. May not be same as the actual radius
-    private float displayRadius;
+    protected float displayRadius;
     // The current position of the center of the oval
-    private float xPos, yPos;
+    protected float xPos, yPos;
     // The current velocity of the oval
-    private float xVel, yVel;
-    private final float initXVel, initYVel;
+    protected float xVel, yVel;
+    protected final float initXVel, initYVel;
 
     // Mass of oval. Used to calculate change in velocity
-    private final float MASS = 10.0f;
+    protected final float MASS = 10.0f;
     // Oval coefficient of restitution. Used in collisions with edge
-    private final float RESTITUTION = 0.4f;
+    protected final float RESTITUTION = 0.4f;
     // A frictional coefficient. Allows more fine control at low speed
-    private final float VISCOSITY = 0.20f;    
+    protected final float VISCOSITY = 0.20f;    
     
     public Bitmap b;
 

@@ -29,8 +29,8 @@ public class Player{
     // A frictional coefficient. Allows more fine control at low speed
     protected final float VISCOSITY = 0.20f;    
     
+    public final Bitmap B;
     public Bitmap b;
-
 
     public Player(float x, float y, float rad, float cWidth, float cHeight, Context c){
         xPos = x;
@@ -47,7 +47,8 @@ public class Player{
         // Create the RectF object centered at x,y
         oval = new RectF(x-radius,y-radius,x+radius,y+radius);
         
-        b = BitmapFactory.decodeResource(c.getResources(), R.raw.pramods11);
+        B = BitmapFactory.decodeResource(c.getResources(), R.raw.pramods11);
+        b = Bitmap.createScaledBitmap(B, (int) (B.getWidth()*rad*2/B.getHeight()), (int) (rad*2), false);
     }
 
 
@@ -72,6 +73,8 @@ public class Player{
                  oval.top-radiusChange, 
                  oval.right+radiusChange, 
                  oval.bottom+radiusChange);
+        
+        b = Bitmap.createScaledBitmap(B, (int)(B.getWidth()*radius*2/B.getHeight()), (int)radius*2, false);
 
         return false; // Oval is alive, return false
     }

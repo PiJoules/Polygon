@@ -18,7 +18,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="Test2">
+            android:name="GameActivity">
         </activity>
         <activity
             android:name="Settings">

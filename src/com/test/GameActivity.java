@@ -30,11 +30,11 @@ import java.util.Random;
 import java.util.Iterator;
 
 
-// Test2 is the object that represents and controls the game the user plays
-// Test2 is an activity since it is its own screen in the app
+// GameActivity is the object that represents and controls the game the user plays
+// GameActivity is an activity since it is its own screen in the app
 // It uses methods in the SensorEventListener interface since it uses the
 // accelerometer as a controler
-public class Test2 extends Activity implements SensorEventListener{
+public class GameActivity extends Activity implements SensorEventListener{
     
     private boolean pramod = false;
     
@@ -231,10 +231,6 @@ public class Test2 extends Activity implements SensorEventListener{
         // will only redraw itself at set intervals and sleep if it completes drawing before the 
         // time is up in an iteration
         private final long FRAME_PERIOD = 1000/40;
-
-        private int misses = 0;
-        private int total = 0;
-
         private long currentTime = System.currentTimeMillis();
         private long nextReDrawTime = currentTime + FRAME_PERIOD;
         private long nextAddition = System.currentTimeMillis() + 1000;
@@ -389,12 +385,8 @@ public class Test2 extends Activity implements SensorEventListener{
     
 
             // Sleep until next frame
-            total++;
             currentTime = System.currentTimeMillis();
             try{
-                if(nextReDrawTime - currentTime < 0){
-                    misses++;
-                }
                 Thread.sleep(Math.max(0,nextReDrawTime - currentTime));
             }
             catch(InterruptedException e){
@@ -402,9 +394,6 @@ public class Test2 extends Activity implements SensorEventListener{
             }
 
             // draw text on canvas
-            p.setTextSize(defaultTextSize/ci.getLastScaleRatio());
-            p.setTextAlign(Paint.Align.LEFT);
-            canvas.drawText(Float.toString(((float) misses)/((float) total)), 10 - ci.getScalingCanvasdx(), 10 - ci.getScalingCanvasdy() - p.ascent(), p);
             p.setTextAlign(Paint.Align.RIGHT);
             p.setTextSize(3*defaultTextSize/ci.getLastScaleRatio());
             canvas.drawText(String.format("%.2f", size), canvasWidth-10 + ci.getScalingCanvasdx(), 5+p.getTextSize() - ci.getScalingCanvasdy(), p);

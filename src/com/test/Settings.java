@@ -77,7 +77,7 @@ public class Settings extends Activity {
         pramod = (Button) findViewById(R.id.pramod);
         pramod.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Intent playScreen = new Intent(getApplicationContext(), Test2.class);
+                Intent playScreen = new Intent(getApplicationContext(), GameActivity.class);
                 playScreen.putExtra("pramod", true);
                 // Starts the game
                 startActivity(playScreen);

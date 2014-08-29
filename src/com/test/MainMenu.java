@@ -41,7 +41,7 @@ public class MainMenu extends Activity {
         // Play button event handler
         play.setOnClickListener(new View.OnClickListener(){
             public void onClick(View v){
-                Intent playScreen = new Intent(getApplicationContext(), Test2.class);
+                Intent playScreen = new Intent(getApplicationContext(), GameActivity.class);
                 // Starts the game
                 startActivity(playScreen);
             }

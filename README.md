@@ -1,4 +1,4 @@
-TestApp (Polygon)
+Polygon
 =================
 
 This repository contains the source code of the app we are creating for our EPED 2 project, called Polygon. All java source code is in src/com/test. The xml used for GUI formatting is in res/layout.

@@ -14,7 +14,7 @@ import android.widget.Button;
 
 public class Settings extends Activity {
     // Buttons on the settings screen    
-    private Button filter, noise, vels, clear, pramod, done;
+    private Button filter, clear, pramod, done;
 
     // This method creates the screen (Activity). It overrides the default creation method in the
     // Activity class
@@ -33,7 +33,7 @@ public class Settings extends Activity {
         // Set GUI layout
         setContentView(R.layout.settings_layout);
 
-        // Create filter button        
+        // Create filter button
         filter = (Button) findViewById(R.id.filter);
         // Create filter button handler
         filter.setOnClickListener(new View.OnClickListener() {
@@ -41,26 +41,6 @@ public class Settings extends Activity {
                 // Sends user to the filter control Activity
                 Intent filterControl = new Intent(getApplicationContext(), FilterControl.class);
                 startActivity(filterControl);
-            }
-        });
-
-        // Create filter button
-        noise = (Button) findViewById(R.id.noise);
-        // Create filter button handler
-        noise.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Sends user to the filter control Activity
-                Intent noiseControl = new Intent(getApplicationContext(), NoiseControl.class);
-                startActivity(noiseControl);
-            }
-        });
-        
-        // create vels button
-        vels = (Button) findViewById(R.id.velocities);
-        vels.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Intent velocityVisualization = new Intent(getApplicationContext(), VelocityVisualization.class);
-                startActivity(velocityVisualization);
             }
         });
 

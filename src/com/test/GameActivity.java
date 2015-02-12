@@ -116,7 +116,7 @@ public class GameActivity extends Activity implements SensorEventListener{
         setContentView(mCustomDrawableView); // finally set the view of the game as the custom view
         
         // Creates the accelerometer object. Passes this Activity to the constructor
-        accelSensor = new Accelerometer(this,this, true, true);
+        accelSensor = new Accelerometer(this,this);
     }
     
     
@@ -283,7 +283,7 @@ public class GameActivity extends Activity implements SensorEventListener{
                     
                     // Calculate new speed and position of player and move player
                     // Handled in player class
-                    oval.move(accelSensor.getAccelFiltered(),
+                    oval.move(accelSensor.getAccel(),
                               ci.getCanvasBounds()[0],
                               ci.getCanvasBounds()[1],
                               ci.getCanvasBounds()[2], 

@@ -20,25 +20,11 @@
         android:layout_below="@id/title">
     </Button>
     <Button
-        android:id="@+id/noise"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Visualise Noise"
-        android:layout_below="@id/filter">
-    </Button>
-    <Button
-        android:id="@+id/velocities"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Visualize Velocities"
-        android:layout_below="@id/noise">
-    </Button>
-    <Button
         android:id="@+id/clear"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Clear Local Scores"
-        android:layout_below="@id/velocities">
+        android:layout_below="@id/filter">
     </Button>
     <Button
         android:id="@+id/pramod"

@@ -27,16 +27,7 @@
             android:name="FilterControl">
         </activity>
         <activity
-            android:name="NoiseControl">
-        </activity>
-        <activity
-            android:name="TimeSeriesActivity">
-        </activity>
-        <activity
-            android:name="NoiseVisualization">
-        </activity>
-        <activity
-            android:name="VelocityVisualization">
+            android:name="Settings">
         </activity>
     </application>
 </manifest>

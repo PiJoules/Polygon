@@ -13,19 +13,19 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Button;
 
 // Object that allows the user to change filtering settings
 public class FilterControl extends Activity implements SensorEventListener {
     // Buttons
-    private Button alpha, sma, none, accelerometer_test, done;
+    private Button done;
     // Text fields
-    private TextView filter_type, description, filter_val_type, filter_val_description;
+    private TextView description, filter_val_type, filter_val_description;
     // Text fields that allow user to change content to desired filtering settings
-    private EditText filter_val, threshold_val;
+    private EditText filter_val;
     // The GUI layout
     private LinearLayout filter_val_entry;
     // File manager for the GUI settings
@@ -53,66 +53,12 @@ public class FilterControl extends Activity implements SensorEventListener {
         
         // Initialize modifiable text boxes
         filter_val = (EditText) findViewById(R.id.filter_val);
-        threshold_val = (EditText) findViewById(R.id.threshold_val);
-        threshold_val.setText(afm.getAccelData()[3] + "");
         
         // Intialize text fields
-        filter_type = (TextView) findViewById(R.id.filter_type);
         description = (TextView) findViewById(R.id.description);
-        filter_val_type = (TextView) findViewById(R.id.filter_val_type);
         filter_val_description = (TextView) findViewById(R.id.filter_val_description);
         
         filter_val_entry = (LinearLayout) findViewById(R.id.filter_val_entry);
-        
-        // EMA button that allows the user to selct the EMA filter
-        alpha = (Button) findViewById(R.id.alpha);
-        // EMA button event handler
-        alpha.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Display information about EMA
-                showAlphaInfo();
-                // Edit the accleration file settings
-                afm.setFilter(AccelerometerFileManager.EMA);
-            }
-        });
-        
-        // SMA button that allows the user to select the SMA filter
-        sma = (Button) findViewById(R.id.sma);
-        // SMA button event handler
-        sma.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Display information about SMA
-                showSMAInfo();
-                // Edit the acceleration file settings
-                afm.setFilter(AccelerometerFileManager.SMA);
-            }
-        });
-        
-        // None button that allows the user to select no filter
-        none = (Button) findViewById(R.id.none);
-        // None button event handler
-        none.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Display information about no filtering
-                showNoneInfo();
-                // Edit the accleration file settings
-                afm.setFilter(AccelerometerFileManager.NONE);
-            }
-        });
-        
-        // Button to allow the user to test their new settings
-        accelerometer_test = (Button) findViewById(R.id.accelerometer_test);
-        // Handler for the test button
-        accelerometer_test.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Try to save new settings
-                if (saveAllData()){
-                    Intent plotTest = new Intent(getApplicationContext(), TimeSeriesActivity.class);
-                    // Send user to graphing screen
-                    startActivity(plotTest);
-                }
-            }
-        });
 
         // Done button that allows the user to exit the Activity
         done = (Button) findViewById(R.id.done);
@@ -124,61 +70,28 @@ public class FilterControl extends Activity implements SensorEventListener {
             }
         });
         
-
-        // Set the content of the filter information text field according to the selected filter
-        if (afm.getFilterType() == 0){
-            showNoneInfo();
-        }
-        else if (afm.getFilterType() == 1){
-            showAlphaInfo();
-        }
-        else if (afm.getFilterType() == 2){
-            showSMAInfo();
-        }
     }
 
     // Display information about alpha filter    
     private void showAlphaInfo(){
-        filter_type.setText(alpha.getText());
         description.setText(R.string.alpha_description);
-        filter_val_type.setText("Alpha: ");
-        filter_val.setText(afm.getAccelData()[1] + "");
+        filter_val.setText(afm.getAccelData()[AccelerometerFileManager.ALPHA] + "");
         filter_val_description.setVisibility(View.VISIBLE);
         filter_val_description.setText(R.string.alpha_val_description);
         filter_val_entry.setVisibility(View.VISIBLE);
     }
-    
-    // Display information about SMA filter
-    private void showSMAInfo(){
-        filter_type.setText(sma.getText());
-        description.setText(R.string.sma_description);
-        filter_val_type.setText("N: ");
-        filter_val.setText((int) afm.getAccelData()[2] + "");
-        filter_val_description.setVisibility(View.VISIBLE);
-        filter_val_description.setText(R.string.sma_val_description);
-        filter_val_entry.setVisibility(View.VISIBLE);
-    }
-    
-    // Display information about no filter
-    private void showNoneInfo(){
-        filter_type.setText(none.getText());
-        description.setText(R.string.none_description);
-        filter_val_description.setVisibility(View.GONE);
-        filter_val_entry.setVisibility(View.GONE);
-    }
-    
-    // Method for creating a dialog box that contains the accelerometer plots
+
+     // Method for creating a dialog box that contains the accelerometer plots
     private void createAlertDialog(String message){
         new AlertDialog.Builder(this)
-                .setTitle(message)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
-                    public void onClick(DialogInterface dialog, int which){
-                        Intent plotTest = new Intent(getApplicationContext(), TimeSeriesActivity.class);
-                        startActivity(plotTest);
-                    }
-                }).show();
+            .setTitle(message)
+            .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener(){
+                public void onClick(DialogInterface dialog, int which){
+                    finish();
+                }
+        }).show();
     }
-    
+        
     // Method that is called when the user exits the screen. Saves new settings
     @Override
     protected void onDestroy() {
@@ -190,55 +103,26 @@ public class FilterControl extends Activity implements SensorEventListener {
     private boolean saveAllData(){
         // CHecks if text box is empty and sets value to defualt value
         if ("".equals(filter_val.getText().toString())) filter_val.setText("1");
-        // CHecks if text box is empty and sets value to defualt value
-        if ("".equals(threshold_val.getText().toString())) threshold_val.setText("5.0");
 
-        // Get values of filterring settings
+        // Get values of filtering settings
         float val = Float.parseFloat(filter_val.getText().toString());
-        float tval = Float.parseFloat(threshold_val.getText().toString());
+        
+        if (val < 0.01){
+            val = 0.01f;
+            afm.setAlpha(val);
+            filter_val.setText(val+"");
+            createAlertDialog("Alpha was set to 0.01 since alpha cannot be less than 0.01.");
+            return false;
+        }
+        else if (val > 1){
+            val = 1f;
+            afm.setAlpha(val);
+            filter_val.setText(val+"");
+            createAlertDialog("Alpha was set to 1 since alpha cannot be greater than 1.");
+            return false;
+        }
 
-        // Check the filtering type and change settings file accordingly
-        afm.setThreshold(tval);
-        if (afm.getFilterType() == AccelerometerFileManager.EMA){
-            if (val < 0.01){
-                val = 0.01f;
-                afm.setAlpha(val);
-                filter_val.setText(val+"");
-                createAlertDialog("Alpha was set to 0.01 since alpha cannot be less than 0.01.");
-                return false;
-            }
-            else if (val > 1){
-                val = 1f;
-                afm.setAlpha(val);
-                filter_val.setText(val+"");
-                createAlertDialog("Alpha was set to 1 since alpha cannot be greater than 1.");
-                return false;
-            }
-            else {
-                afm.setAlpha(val);
-                return true;
-            }
-        }
-        else if (afm.getFilterType() == AccelerometerFileManager.SMA){
-            if (val < 1){
-                val = 1;
-                afm.setPeriods((int)val);
-                filter_val.setText(val+"");
-                createAlertDialog("N was set to 1 since N cannot be less than 1.");
-                return false;
-            }
-            else if (val%1 != 0){
-                val = Math.round(val);
-                afm.setPeriods((int)val);
-                filter_val.setText(val+"");
-                createAlertDialog("N was rounded since N must be an integer.");
-                return false;
-            }
-            else {
-                afm.setPeriods((int) val);
-                return true;
-            }
-        }
+        afm.setAlpha(val);
         return true;
     }
 

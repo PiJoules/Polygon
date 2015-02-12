@@ -33,7 +33,7 @@ import org.apache.http.util.EntityUtils;
 public class HTTPManager {
     
     private final Activity a;
-    private final String url = "http://www.kompactit.com/polygon/postscores.php"; // just using space on my current website
+    private final String url = "http://polygon-server.appspot.com"; // just using space on my current website
     private final String ERR = "err";
     private String httpResponse = "";
     

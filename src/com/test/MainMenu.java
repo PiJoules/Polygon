@@ -66,7 +66,7 @@ public class MainMenu extends Activity {
         super.onResume();
         ScoreManager sm = new ScoreManager(this);
         String[][] scores = sm.getParsedScores();
-        
+                
         // Create table if it doesn't already exist
         if (table == null){
             table = (TableLayout) findViewById(R.id.table);

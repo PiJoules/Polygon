@@ -57,6 +57,8 @@ public class MainMenu extends Activity {
                 startActivity(settingsScreen);
             }
         });
+        
+        updateScores();
     }
     
 
@@ -64,6 +66,10 @@ public class MainMenu extends Activity {
     @Override
     protected void onResume(){
         super.onResume();
+        updateScores();
+    }
+    
+    private void updateScores(){
         ScoreManager sm = new ScoreManager(this);
         String[][] scores = sm.getParsedScores();
                 

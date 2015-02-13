@@ -1,4 +1,4 @@
-package com.test;
+package com.test.Polygon;
 
 // Android import
 import android.content.Context;

@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.test;
+package com.test.Polygon;
 
 import android.app.Activity;
 import android.content.Context;

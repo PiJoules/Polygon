@@ -1,4 +1,4 @@
-package com.test;
+package com.test.Polygon;
 
 import android.content.Context;
 import android.graphics.Bitmap;

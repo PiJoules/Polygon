@@ -1,4 +1,4 @@
-package com.test;
+package com.test.Polygon;
 
 // Android imports
 import android.app.Activity;

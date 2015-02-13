@@ -1,5 +1,4 @@
-
-package com.test;
+package com.test.Polygon;
 
 // class for setting contraints for the objects on the canvas and the 
 

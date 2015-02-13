@@ -1,4 +1,4 @@
-package com.test;
+package com.test.Polygon;
 
 // These are various libraries that are used
 
